@@ -1,0 +1,211 @@
+{
+  "main": {
+    "id": "a13c6133c0e8b888",
+    "type": "split",
+    "children": [
+      {
+        "id": "bb786ee6952c7736",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f0436e2810a99f0a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Comparisions/Filesystem Model vs API-Centric Agent Systems.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Filesystem Model vs API-Centric Agent Systems"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5692cba8ac8142f6",
+    "type": "split",
+    "children": [
+      {
+        "id": "08a91a78ce4826b0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f8997295bc195b6e",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "5e77638c2e052ad4",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "48ac7c2dc36eea7d",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 299.5
+  },
+  "right": {
+    "id": "f848600603f1896c",
+    "type": "split",
+    "children": [
+      {
+        "id": "d0c63645e9bdfd6c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0d1fd10b54a254c4",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Core/Core Terminology.md.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Core Terminology.md"
+            }
+          },
+          {
+            "id": "5efa1af6aa71f78c",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Core/Core Terminology.md.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Core Terminology.md"
+            }
+          },
+          {
+            "id": "9238943813ad22e8",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "c0a38565a194e23e",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "93e309725bbd6316",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Core/Core Terminology.md.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Core Terminology.md"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "f0436e2810a99f0a",
+  "lastOpenFiles": [
+    "Core/Architectural Principles.md",
+    "Core/Capability Discovery Through Traversal.md",
+    "Core/Core Terminology.md",
+    "Core/Design Constraints.md",
+    "Core/Environment Transparency.md",
+    "Core/Filesystem as the Universal Capability Model.md",
+    "Core/Problem Statement.md",
+    "Memory/Context as Working Set.md",
+    "Memory/Memory as Structured Files.md",
+    "Views/🕸 Introduction.md",
+    "Views/Historical Precedent.md",
+    "Spider Web Overview.md",
+    "Comparisions/Filesystem Model vs API-Centric Agent Systems.md",
+    "Core/Minimal Primitive Surface.md.md",
+    "Core/Agents as First-Class Processes.md",
+    "Unsorted",
+    "Comparisions",
+    "Memory",
+    "Views",
+    "Core",
+    "Welcome.md",
+    "create a link.md"
+  ]
+}
