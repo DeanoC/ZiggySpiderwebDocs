@@ -1,56 +1,19 @@
-# Unified-v2 Control: Agents & Sessions
+# Unified-v2 Control, Agents, And Sessions
 
-This document describes the control-plane handshake plus the agent discovery and session control operations that Spiderweb implements today.
+This file describes the active control-plane contract used by the current implementation.
 
-## Handshake (Required)
+## Handshake
 
-All control operations require an explicit negotiation:
-
-1. `control.version` with payload `{"protocol":"unified-v2"}`
+Required sequence:
+1. `control.version` with `{"protocol":"unified-v2"}`
 2. `control.connect`
 
-`control.version_ack` returns protocol + FS protocol hints:
-- `protocol` (currently `unified-v2`)
-- `fsrpc_runtime` (currently `acheron-1`)
-- `fsrpc_node` (currently `unified-v2-fs`)
-- `fsrpc_node_proto` (currently `2`)
+`control.version_ack` reports control/runtime protocol hints.
+`control.connect_ack` reports role, default binding, and attach/bootstrap gating fields.
 
-`control.connect_ack` returns session binding and gating information:
-- `agent_id`
-- `project_id` (nullable)
-- `session` (current session key)
-- `protocol`
-- `role` (`admin` | `user`)
-- `bootstrap_only` (bool)
-- `bootstrap_message` (nullable)
-- `requires_session_attach` (bool)
-- `connect_gate` (nullable `{code,message}`)
+## Active Session Operations
 
-## Agent Discovery
-
-### `control.agent_list`
-Returns all agent registry entries.
-
-### `control.agent_get`
-Requires payload `{"agent_id":"<id>"}`.
-
-Agent fields:
-- `id`
-- `name`
-- `description`
-- `is_default`
-- `identity_loaded`
-- `needs_hatching`
-- `capabilities` (array of `chat`, `code`, `plan`, `research`)
-
-Errors:
-- `agent_not_found`
-- `missing_field`
-- `invalid_payload`
-
-## Session Control
-
-Supported operations:
+Implemented session operations:
 - `control.session_attach`
 - `control.session_status`
 - `control.session_resume`
@@ -59,87 +22,73 @@ Supported operations:
 - `control.session_restore`
 - `control.session_history`
 
-### `control.session_attach`
-Payload:
-- `session_key` (required)
-- `agent_id` (required)
-- `project_id` (optional)
-- `project_token` (optional)
+These remain part of bootstrap/selection flow even though runtime work is file-based over Acheron.
 
-Notes:
-- User role cannot attach to the system agent/project.
-- When no non-system project exists, users will be gated until an admin provisions one.
-- If a project requires a token, `project_token` is required for token-scoped actions.
+## Active Project Operations
 
-Response payload:
-- `session_key`
-- `agent_id`
-- `project_id` (nullable)
-- `workspace` (workspace status snapshot)
-- `attach` (runtime attach state snapshot)
+Implemented project/workspace operations:
+- `control.project_create`
+- `control.project_update`
+- `control.project_delete`
+- `control.project_list`
+- `control.project_get`
+- `control.project_mount_set`
+- `control.project_mount_remove`
+- `control.project_mount_list`
+- `control.project_token_rotate`
+- `control.project_token_revoke`
+- `control.project_activate`
+- `control.project_up`
+- `control.workspace_status`
+- `control.reconcile_status`
 
-### `control.session_status`
-Payload:
-- `session_key` (optional; defaults to active session)
+## Active Node Operations
 
-Response payload:
-- `session_key`
-- `agent_id`
-- `project_id` (nullable)
-- `attach` (runtime attach state snapshot)
-- `session_last_activity_ms`
-- `session_stale`
-- `agent_last_heartbeat_ms`
-- `agent_stale`
-- `recoverable`
+Implemented node/admin operations:
+- `control.node_invite_create`
+- `control.node_join_request`
+- `control.node_join_pending_list`
+- `control.node_join_approve`
+- `control.node_join_deny`
+- `control.node_join`
+- `control.node_lease_refresh`
+- `control.node_service_upsert`
+- `control.node_service_get`
+- `control.node_list`
+- `control.node_get`
+- `control.node_delete`
 
-### `control.session_resume`
-Payload:
-- `session_key` (required)
+## Other Active Control Operations
 
-### `control.session_list`
-Response payload:
-- `active_session`
-- `sessions[]` entries with `session_key`, `agent_id`, `project_id`
+- `control.auth_status`
+- `control.auth_rotate`
+- `control.metrics`
+- `control.audit_tail`
+- `control.ping`
+- `control.pong`
 
-### `control.session_close`
-Payload:
-- `session_key` (required)
+## Removed From The Active Client Contract
 
-### `control.session_restore`
-Payload:
-- `agent_id` (optional)
+These names are no longer part of the protocol and are rejected at parse time:
+- `control.debug_subscribe`
+- `control.debug_unsubscribe`
+- `control.node_service_watch`
+- `control.node_service_unwatch`
+- `control.node_service_event`
 
-Response payload:
-- `{"found":false}` when no persisted session exists
-- `{"found":true,"session":{...}}` when a session is available
+Current replacement:
+- read `/debug/stream.log` over Acheron for persisted debug stream snapshots
+- read `/global/services/node-service-events.ndjson` over Acheron
 
-Returned `session` fields:
-- `session_key`
-- `agent_id`
-- `project_id`
-- `last_active_ms`
-- `message_count`
-- `summary` (nullable)
+## Attach And Runtime Boundary
 
-### `control.session_history`
-Payload:
-- `agent_id` (optional)
-- `limit` (optional, default 10, max 100)
+After control bootstrap/attach, runtime work should move to:
+- `acheron.t_version`
+- `acheron.t_attach`
+- file reads/writes/stats/walks/clunks under the worldfs namespace
 
-Response payload:
-- `sessions` list (newest-first)
+## Source Files
 
-## Related Control Operations
-
-- `control.project_*`, `control.workspace_status` for project provisioning
-- `control.node_*` and `control.node_service_*` for node lifecycle and service catalog
-- `control.auth_status`, `control.auth_rotate` for control-plane tokens
-- `control.audit_tail` for audit trail
-
-## Implementation Notes
-
-Primary references:
-- `src/server_piai.zig`
-- `src/agent_registry.zig`
-- `ZiggySpiderProtocol/src/unified_types.zig`
+- `Spiderweb/src/server_piai.zig`
+- `SpiderProtocol` checkout: `Spiderweb/deps/spider-protocol/src/unified_types.zig`
+- `SpiderApp/src/client/control_plane.zig`

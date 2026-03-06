@@ -1,105 +1,76 @@
 # Acheron WorldFS
 
-Acheron WorldFS is the agent-visible filesystem exposed over the `acheron-1` protocol. The layout below reflects the current runtime implementation.
+This is the current runtime contract implemented by `fsrpc_session`.
+
+## Version And Attach
+
+Runtime negotiation:
+1. `acheron.t_version` with `version:"acheron-1"`
+2. `acheron.t_attach`
+
+`acheron.r_attach` currently returns:
+- `qid`
+- `layout:"worldfs-v1"`
+- `project_id` or `null`
+- `roots`
+- `dynamic_bind_paths`
+- `bind_count`
+
+`/meta/protocol.json` currently reports:
+- `channel:"acheron"`
+- `version:"acheron-1"`
+- `layout:"worldfs-v1"`
 
 ## Root Layout
 
-```
-/
-├── agents/
-│   └── self/
-│       ├── chat/
-│       │   ├── control/input
-│       │   └── meta.json
-│       ├── jobs/<job_id>/{status.json,result.txt}
-│       ├── events/{control/wait.json,next.json,sources/*}
-│       ├── memory/...
-│       ├── web_search/...
-│       ├── search_code/...
-│       ├── terminal/...
-│       ├── mounts/...
-│       ├── sub_brains/...
-│       ├── agents/...
-│       └── services/SERVICES.json
-├── nodes/
-│   └── <node_id>/
-│       ├── services/<service_id>/...
-│       └── <resource_roots...>
-├── projects/
-│   └── <project_id>/{fs,nodes,agents,meta}
-├── meta/
-│   ├── protocol.json
-│   ├── view.json
-│   ├── workspace_status.json
-│   ├── workspace_availability.json
-│   ├── workspace_health.json
-│   └── workspace_alerts.json
-└── debug/ (only when enabled by policy)
-```
+The attached root is seeded with:
+- `/nodes`
+- `/agents`
+- `/users`
+- `/projects`
+- `/global`
+- `/meta`
+- optional `/debug`
 
-`protocol.json` records `acheron-1` and the `world-v1` layout.
+Dynamic project bind paths may also appear directly at `/`.
 
-## Agent Namespace Services
+## Canonical Runtime Paths
 
-Service discovery starts at:
-
-- `/global/services/SERVICES.json`
-
-Each service directory contains a contract set (`README.md`, `SCHEMA.json`, `CAPS.json`, `OPS.json`, `PERMISSIONS.json`, `STATUS.json`) plus `control/*.json`, `status.json`, and `result.json` for invocation.
-
-Implemented services:
-- `memory`
-- `web_search`
-- `search_code`
-- `terminal` (terminal-v2)
-- `mounts`
-- `sub_brains`
-- `agents`
-
-## Jobs and Events
-
-- Chat input path: `/global/chat/control/input`
-- Job status path: `/global/jobs/<job_id>/status.json`
-- Job result path: `/global/jobs/<job_id>/result.txt`
-
-Event wait flow:
-
-1. Write a selector to `/global/events/control/wait.json`.
-2. Read `/global/events/next.json` for the next matching event.
-
-Supported event sources include:
+Use these paths as the current contract:
 - `/global/chat/control/input`
 - `/global/jobs/<job_id>/status.json`
-- `/global/events/sources/time/after/<ms>.json`
-- `/global/events/sources/time/at/<unix_ms>.json`
-- `/global/events/sources/agent/<parameter>.json`
-- `/global/events/sources/hook/<parameter>.json`
-- `/global/events/sources/user/<parameter>.json`
+- `/global/jobs/<job_id>/result.txt`
+- `/global/events/control/wait.json`
+- `/global/events/next.json`
+- `/global/events/sources/*`
+- `/global/services/SERVICES.json`
+- `/global/services/node-service-events.ndjson`
+- `/projects/<project_id>/fs`
+- `/projects/<project_id>/nodes`
+- `/projects/<project_id>/agents`
+- `/projects/<project_id>/meta`
+- `/meta/protocol.json`
+- `/meta/workspace_status.json`
+- `/meta/workspace_availability.json`
+- `/meta/workspace_health.json`
 
-## Node Services
+When debug is visible by policy:
+- `/debug/stream.log`
 
-Node services are projected from the control-plane catalog into:
+## Invalidations
 
-- `/nodes/<node_id>/services/<service_id>`
-- `/nodes/<node_id>/<resource>` (compat view derived from service mounts)
+Runtime push traffic is limited to generic filesystem invalidations:
+- `acheron.e_fs_inval`
+- `acheron.e_fs_inval_dir`
 
-If a node advertises an explicit empty catalog, no fallback resources are exposed for that node.
+Clients should treat file contents as authoritative and use invalidations to decide when to reread.
 
-## Project View
+## Notes
 
-Project links under `/projects/<project_id>` expose:
+- The retained node-service feed replaces the old control watch/event contract.
+- The implementation still contains compatibility aliases in some places, but the canonical runtime contract is the path-based one above.
 
-- `fs/` (links to mount paths)
-- `nodes/` (links to `/nodes/<node_id>`)
-- `agents/` (links to `/agents/<agent_id>`)
-- `meta/` (project topology, mounts, availability, drift, and reconcile state)
+## Source Files
 
-## Debug Pairing
-
-When debug is enabled by policy (typically for `mother`), `/debug/` exposes pairing queue controls and invite workflows.
-
-## Implementation Pointers
-
-- WorldFS session: `src/fsrpc_session.zig`
-- Policy defaults: `src/world_policy.zig`
-- Control-plane topology: `src/fs_control_plane.zig`
+- `Spiderweb/src/fsrpc_session.zig`
+- `Spiderweb/src/fs_control_plane.zig`

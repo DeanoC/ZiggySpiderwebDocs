@@ -1,150 +1,44 @@
-# Node Pairing and Approval
+# Node Pairing And Approval
 
-This document defines how nodes become trusted members of Spiderweb.
+This is the current node onboarding and lease flow implemented by Spiderweb.
 
 ## Pairing Modes
 
-- Invite-based pairing:
-  - Operator creates an invite token (`control.node_invite_create`).
-  - Node redeems invite (`control.node_join`) and receives node credentials.
-- Manual approval pairing:
-  - Node submits a pending request (`control.node_join_request`).
-  - Operator reviews queue (`control.node_join_pending_list`).
-  - Operator approves (`control.node_join_approve`) or denies (`control.node_join_deny`).
+### Invite flow
+- admin creates an invite with `control.node_invite_create`
+- node redeems it with `control.node_join`
+- server returns `node_id`, `node_secret`, `lease_token`, and `lease_expires_at_ms`
 
-Both modes result in the same node identity material:
+### Approval flow
+- node submits `control.node_join_request`
+- admin reads `control.node_join_pending_list`
+- admin approves with `control.node_join_approve` or denies with `control.node_join_deny`
 
-- `node_id`
-- `node_secret`
-- `lease_token`
-- `lease_expires_at_ms`
+Both flows end with the same node identity and lease material.
 
-## Control Operations
+## Lease
 
-### `control.node_join_request`
+Paired nodes refresh leases with:
+- `control.node_lease_refresh`
 
-Request payload:
+## Service Catalog
 
-```json
-{
-  "node_name": "desktop-west",
-  "fs_url": "ws://10.0.0.8:18891/v2/fs",
-  "platform": { "os": "linux", "arch": "amd64", "runtime_kind": "native" }
-}
-```
+Nodes publish service state with:
+- `control.node_service_upsert`
 
-Response payload includes:
+Clients fetch current catalog state with:
+- `control.node_service_get`
+- Acheron reads under `/nodes/<node_id>/services/*`
+- retained feed reads from `/global/services/node-service-events.ndjson`
 
-- `request_id`
-- `node_name`
-- `fs_url`
-- `platform`
-- `requested_at_ms`
+## Important Notes
 
-### `control.node_join_pending_list`
+- `control.node_service_watch` is no longer recognized; use `/global/services/node-service-events.ndjson` over Acheron.
+- The current monitoring path is the retained worldfs file feed.
+- Router traffic to paired node endpoints uses one websocket per endpoint connection.
 
-Request payload may be `{}`.
+## Source Files
 
-Response payload:
-
-```json
-{
-  "pending": [
-    {
-      "request_id": "pending-join-1",
-      "node_name": "desktop-west",
-      "fs_url": "ws://10.0.0.8:18891/v2/fs",
-      "platform": { "os": "linux", "arch": "amd64", "runtime_kind": "native" },
-      "requested_at_ms": 1739900000000
-    }
-  ]
-}
-```
-
-### `control.node_join_approve`
-
-Request payload:
-
-```json
-{
-  "request_id": "pending-join-1",
-  "lease_ttl_ms": 900000
-}
-```
-
-Response is the same join credential envelope as `control.node_join`.
-
-### `control.node_join_deny`
-
-Request payload:
-
-```json
-{
-  "request_id": "pending-join-1"
-}
-```
-
-Response payload:
-
-```json
-{
-  "denied": true,
-  "request_id": "pending-join-1"
-}
-```
-
-## Auth and Role Expectations
-
-- Approval queue operations are admin-only.
-- Approval queue operations require operator-scope auth token if configured.
-- `control.node_join_request` is intentionally non-admin to allow unpaired join proposals.
-
-## Acheron WorldFS Operator Surface
-
-Privileged agents can manage pairing through WorldFS without direct control RPC calls:
-
-- Read pending requests: `/debug/pairing/pending.json`
-- Approve request: write JSON payload to `/debug/pairing/control/approve.json`
-- Deny request: write JSON payload to `/debug/pairing/control/deny.json`
-- Refresh queue snapshot: write any payload to `/debug/pairing/control/refresh`
-- Create invite token: write optional payload to `/debug/pairing/invites/control/create.json`
-- Refresh invite snapshot: write any payload to `/debug/pairing/invites/control/refresh`
-- Read active invites: `/debug/pairing/invites/active.json`
-- Inspect queue outcomes: `/debug/pairing/last_result.json` and `/debug/pairing/last_error.json`
-- Inspect invite outcomes: `/debug/pairing/invites/last_result.json` and `/debug/pairing/invites/last_error.json`
-
-## Node Daemon Loop (`spiderweb-fs-node`)
-
-`spiderweb-fs-node` can now run as a pairing/lease daemon when `--control-url` is set.
-
-Behavior:
-
-- Loads persisted node state from `--state-file` (default `.spiderweb-fs-node-state.json`).
-- If not paired:
-  - `--pair-mode invite`: calls `control.node_join` using `--invite-token`.
-  - `--pair-mode request`: calls `control.node_join_request`, then retries `control.node_join_approve`.
-- Once paired, uses `node_secret` as FS session auth token (unless `--auth-token` is explicitly provided).
-- Runs a background lease refresh loop via `control.node_lease_refresh`.
-- Publishes node capability/service metadata via `control.node_service_upsert`:
-  - FS provider enabled by default.
-  - terminal providers from `--terminal-id`.
-  - labels from `--label`.
-- Persists updated lease fields (`lease_token`, `lease_expires_at_ms`) after each successful refresh.
-- Uses reconnect backoff for both pairing retries and lease refresh failures.
-
-Key flags:
-
-- `--control-url <ws://host:port/>`
-- `--control-auth-token <token>` (or `SPIDERWEB_AUTH_TOKEN`)
-- `--pair-mode invite|request`
-- `--invite-token <token>` (required for invite mode)
-- `--node-name <name>`
-- `--fs-url <ws://host:port/v2/fs>` (advertised node URL)
-- `--state-file <path>`
-- `--lease-ttl-ms <ms>`
-- `--refresh-interval-ms <ms>`
-- `--reconnect-backoff-ms <ms>`
-- `--reconnect-backoff-max-ms <ms>`
-- `--no-fs-service` (disable default FS service advertisement)
-- `--terminal-id <id>` (repeatable)
-- `--label <key=value>` (repeatable)
+- `Spiderweb/src/server_piai.zig`
+- `Spiderweb/src/fs_control_plane.zig`
+- `Spiderweb/src/fs_router.zig`
