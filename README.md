@@ -1,4 +1,4 @@
-# ZiggySpiderweb Documentation
+# Spiderweb Documentation
 
 This folder contains the maintained docs for Spiderweb. Files are grouped by topic; older design notes have been refreshed and moved under `docs/design/`.
 
@@ -6,7 +6,7 @@ This folder contains the maintained docs for Spiderweb. Files are grouped by top
 - `../README.md` - build, install, and quick usage
 - `overview.md` - vision, architecture, protocols, configuration, and FS runtime examples
 - `protocols/control-agent-session.md` - unified-v2 control handshake, agent discovery, and session control
-- `protocols/acheron-worldfs.md` - Acheron WorldFS layout and service contracts
+- `protocols/acheron-worldfs.md` - Acheron namespace layout and service contracts
 - `runtime/tool-system.md` - provider-driven tool loop and tool constraints
 
 ## Architecture & Design

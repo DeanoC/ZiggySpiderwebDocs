@@ -1,43 +1,37 @@
-# Acheron WorldFS
+# Acheron Namespace
 
-Acheron WorldFS is the agent-visible filesystem exposed over the `acheron-1` protocol. The layout below reflects the current runtime implementation.
+The Acheron namespace is the agent-visible filesystem exposed over the `acheron-1` protocol. The layout below reflects the current runtime implementation.
 
 ## Root Layout
 
 ```
 /
 ├── agents/
-│   └── self/
-│       ├── chat/
-│       │   ├── control/input
-│       │   └── meta.json
-│       ├── jobs/<job_id>/{status.json,result.txt}
-│       ├── events/{control/wait.json,next.json,sources/*}
-│       ├── memory/...
-│       ├── web_search/...
-│       ├── search_code/...
-│       ├── terminal/...
-│       ├── mounts/...
-│       ├── sub_brains/...
-│       ├── agents/...
-│       └── services/SERVICES.json
+│   └── <agent_id>/
+│       ├── README.md
+│       └── LINK.txt (for visible peer agents)
 ├── nodes/
 │   └── <node_id>/
 │       ├── services/<service_id>/...
 │       └── <resource_roots...>
-├── projects/
-│   └── <project_id>/{fs,nodes,agents,meta}
-├── meta/
-│   ├── protocol.json
-│   ├── view.json
-│   ├── workspace_status.json
-│   ├── workspace_availability.json
-│   ├── workspace_health.json
-│   └── workspace_alerts.json
+├── global/
+│   ├── chat/
+│   ├── jobs/<job_id>/{status.json,result.txt,log.txt}
+│   ├── events/{control/wait.json,next.json,sources/*}
+│   ├── memory/...
+│   ├── web_search/...
+│   ├── search_code/...
+│   ├── terminal/...
+│   ├── mounts/...
+│   ├── sub_brains/...
+│   ├── agents/...
+│   ├── projects/...
+│   ├── services/SERVICES.json
+│   └── library/...
 └── debug/ (only when enabled by policy)
 ```
 
-`protocol.json` records `acheron-1` and the `world-v1` layout.
+`acheron.t_attach` returns `layout="unified-v2-fs"` plus the canonical roots exposed to the session.
 
 ## Agent Namespace Services
 
@@ -85,14 +79,16 @@ Node services are projected from the control-plane catalog into:
 
 If a node advertises an explicit empty catalog, no fallback resources are exposed for that node.
 
-## Project View
+## Project Control
 
-Project links under `/projects/<project_id>` expose:
+Project lifecycle and topology are managed through:
 
-- `fs/` (links to mount paths)
-- `nodes/` (links to `/nodes/<node_id>`)
-- `agents/` (links to `/agents/<agent_id>`)
-- `meta/` (project topology, mounts, availability, drift, and reconcile state)
+- `/global/projects/control/list.json`
+- `/global/projects/control/get.json`
+- `/global/projects/control/up.json`
+- `/global/projects/control/invoke.json`
+
+Project state such as `workspace_status`, `desired_mounts`, `actual_mounts`, `drift`, and reconcile health is surfaced through the project-control APIs rather than a public `/projects/<project_id>` root.
 
 ## Debug Pairing
 
@@ -100,6 +96,6 @@ When debug is enabled by policy (typically for `mother`), `/debug/` exposes pair
 
 ## Implementation Pointers
 
-- WorldFS session: `src/fsrpc_session.zig`
+- Namespace session: `src/fsrpc_session.zig`
 - Policy defaults: `src/world_policy.zig`
 - Control-plane topology: `src/fs_control_plane.zig`

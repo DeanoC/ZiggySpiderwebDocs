@@ -1,6 +1,6 @@
-# ZiggySpiderweb Overview
+# Spiderweb Overview
 
-ZiggySpiderweb is a WebSocket gateway and **Acheron-based distributed RPC filesystem** that lets agents operate in a unified, project-scoped namespace while talking to AI providers.
+Spiderweb is a WebSocket gateway and **Acheron-based distributed RPC filesystem** that lets agents operate in a unified namespace while talking to AI providers.
 
 ## Vision
 
@@ -8,7 +8,7 @@ Agents shouldn’t need bespoke APIs to work across machines or services. The co
 
 Key pillars:
 - Unified-v2 control plane for agents, projects, and sessions.
-- Acheron WorldFS that projects multi-node workspaces + services into a single namespace.
+- Acheron namespace projection that exposes multi-node mounts + services through `/nodes`, `/agents`, and `/global`.
 - Provider-backed chat with streaming + tool execution.
 - Service catalog + policy-gated access to remote capabilities.
 
@@ -81,7 +81,7 @@ Runtime execution uses bounded queues and fixed worker pools. `runtime` keys in 
 Notes:
 - Older inflight-style runtime gating keys are no longer used.
 - Use unified v2 control + Acheron APIs (`control.version`, `control.connect`, `acheron.t_version`, `acheron.t_attach`).
-- Legacy websocket chat envelopes (`session.send`, `chat.send`) are rejected on the unified v2 gateway path.
+- Legacy websocket chat envelopes such as `chat.send` are rejected on the unified-v2 control path.
 
 ### Debug Stream Log Files
 
@@ -184,11 +184,11 @@ OpenClaw Client (ZSC, OpenClaw, etc.)
 ┌─────────────────┐
 │  HTTP Upgrade   │  ← GET /
 ├─────────────────┤
-│  Session ACK    │  ← {"type":"connect.ack",...}
+│  Session ACK    │  ← {"type":"control.connect_ack",...}
 ├─────────────────┤
 │ Optional Bootstrap│ ← {"type":"session.receive",...} on first connect
 ├─────────────────┤
-│  OpenClaw Parse │  ← {"type":"session.send",...}
+│ Runtime Parse   │  ← {"type":"session.send",...}
 ├─────────────────┤
 │   Pi AI Stream  │  → HTTP POST to provider
 ├─────────────────┤

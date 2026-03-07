@@ -72,7 +72,7 @@ Primary files:
 Tasks:
 
 - Implement project rootfs assembly (`base image` + `writable overlay` + optional ephemeral layer).
-- Mount canonical Acheron namespaces (`/agents`, `/nodes`, `/global`, optional `/workspace`) into that rootfs.
+- Mount canonical Acheron namespaces (`/agents`, `/nodes`, `/global`) into that rootfs.
 - Persist snapshot metadata (`base ref`, `overlay id`, mount manifest digest).
 
 Exit criteria:

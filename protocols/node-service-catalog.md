@@ -1,6 +1,6 @@
 # Node Service Catalog Spec
 
-The service catalog describes node-exported namespace services and their mount metadata. It is the control-plane source used to project `/nodes/<node_id>/services/*` and dynamic mount roots in Acheron WorldFS.
+The service catalog describes node-exported namespace services and their mount metadata. It is the control-plane source used to project `/nodes/<node_id>/services/*` and dynamic mount roots in the Acheron namespace.
 
 ## Control Operations
 
@@ -102,7 +102,7 @@ Subscribes to catalog events. Server responds with `control.node_service_event` 
 - `ops`, `runtime`, `permissions`, and `schema` must be JSON objects.
 - `ops.invoke` / `ops.paths.invoke`, when provided, override the default `control/invoke.json` resolve path.
 
-## WorldFS Permission Projection
+## Namespace Permission Projection
 
 `/nodes/<node_id>/services/*` visibility for non-admin sessions evaluates service `permissions` metadata:
 

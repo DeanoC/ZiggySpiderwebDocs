@@ -1,6 +1,6 @@
 # Projects (Current Model)
 
-Projects are the unit of workspace composition and access policy in Spiderweb. They are managed by the control plane and surfaced in WorldFS under `/projects/<project_id>`.
+Projects are the unit of mount composition and access policy in Spiderweb. They are managed by the control plane and exposed through control APIs plus the canonical Acheron namespace.
 
 ## Project Fields (Control Payload)
 
@@ -20,21 +20,20 @@ Projects are the unit of workspace composition and access policy in Spiderweb. T
 
 ## Workspace & Mounts
 
-A project’s workspace is built from mounts that map node exports into project paths. The control plane exposes:
+A project’s effective namespace is built from mounts that map node exports into canonical paths. The control plane exposes:
 
 - `control.project_mount_set`
 - `control.project_mount_remove`
 - `control.project_mount_list`
 - `control.workspace_status`
 
-WorldFS projects the workspace into:
+Mounted resources become visible under canonical namespace roots such as:
 
-- `/projects/<project_id>/fs`
-- `/projects/<project_id>/nodes`
-- `/projects/<project_id>/agents`
-- `/projects/<project_id>/meta`
+- `/nodes/<node_id>/...`
+- `/agents/<agent_id>`
+- `/global/projects`
 
-`/projects/<project_id>/meta` includes `workspace_status.json`, `mounts.json`, `desired_mounts.json`, `actual_mounts.json`, `drift.json`, and availability/health summaries.
+`control.workspace_status` and project metadata files provide `workspace_status`, `mounts`, `desired_mounts`, `actual_mounts`, `drift`, and availability/health summaries.
 
 ## Tokens & Access Policy
 
@@ -52,4 +51,4 @@ Admin tokens bypass project token checks. User tokens must satisfy the project�
 
 - Control plane: `src/fs_control_plane.zig`
 - Control gateway: `src/server_piai.zig`
-- WorldFS projection: `src/fsrpc_session.zig`
+- Acheron namespace projection: `src/fsrpc_session.zig`

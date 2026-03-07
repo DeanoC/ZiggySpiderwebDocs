@@ -11,7 +11,7 @@ Spiderweb exposes a unified project workspace by routing file operations over We
 
 1. Node runtime exports one or more roots (exports).
 2. Control plane records mounts and project topology.
-3. WorldFS projects mounts into `/projects/<project_id>/fs/*`.
+3. Spiderweb projects mounts into the canonical namespace under `/nodes/*`, `/agents/*`, and `/global/*`.
 4. The mount client (`spiderweb-fs-mount`) connects to the node FS endpoint (`/v2/fs`) and serves a local workspace.
 
 ### Protocol Notes

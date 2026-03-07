@@ -12,9 +12,9 @@ This document reflects the runtime architecture as implemented in this repo.
   - Executes chat and tool-call loops.
   - Enforces tool-call constraints and emits debug frames.
 
-- **Acheron WorldFS** (`src/fsrpc_session.zig`)
-  - Projects control-plane state into filesystem namespaces.
-  - Hosts agent services under `/global/*`.
+- **Acheron Namespace Session** (`src/fsrpc_session.zig`)
+  - Projects control-plane state into the agent-visible namespace.
+  - Hosts first-class services under `/global/*` and node resources under `/nodes/*`.
 
 - **Control plane** (`src/fs_control_plane.zig`)
   - Projects, mounts, tokens, node registry, and workspace topology.
@@ -48,7 +48,7 @@ Key config fields (see `src/config.zig`):
 ## State & Persistence
 
 - Auth tokens, session history, and workspace metadata persist under `runtime.ltm_directory`.
-- Project/mount topology is owned by the control plane and reflected into WorldFS.
+- Project/mount topology is owned by the control plane and reflected into the Acheron namespace.
 
 ## Observability
 

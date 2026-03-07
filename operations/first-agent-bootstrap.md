@@ -84,4 +84,4 @@ In CI, provider-chat is auto-gated:
 
 - Mother is system-locked (`project_id=system`) and user role cannot attach to Mother.
 - Project creation requires non-empty `vision`.
-- Unified v2 gateway rejects legacy websocket chat envelopes (`session.send`, `chat.send`).
+- Unified-v2 control rejects legacy websocket chat envelopes such as `chat.send`.
