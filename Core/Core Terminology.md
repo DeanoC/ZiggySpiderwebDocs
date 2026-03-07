@@ -1,6 +1,6 @@
-# Spiders Terminology
+# Spider Terminology
 
-This document defines the canonical meanings of terms used in the Spiders ecosystem.  
+This document defines the canonical meanings of terms used in the Spider ecosystem.  
 These definitions are architectural, not colloquial.
 
 ---
@@ -88,7 +88,7 @@ Examples include:
 - Read
 - Write
 - List
-- 
+
 Primitives are intentionally minimal.  
 Complexity must emerge from composition.
 
