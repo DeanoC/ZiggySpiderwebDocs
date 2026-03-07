@@ -99,9 +99,9 @@ Response payload:
 - Approval queue operations require operator-scope auth token if configured.
 - `control.node_join_request` is intentionally non-admin to allow unpaired join proposals.
 
-## Acheron WorldFS Operator Surface
+## Acheron Namespace Operator Surface
 
-Privileged agents can manage pairing through WorldFS without direct control RPC calls:
+Privileged agents can manage pairing through the Acheron namespace without direct control RPC calls:
 
 - Read pending requests: `/debug/pairing/pending.json`
 - Approve request: write JSON payload to `/debug/pairing/control/approve.json`

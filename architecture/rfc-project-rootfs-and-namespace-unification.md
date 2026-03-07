@@ -9,7 +9,7 @@ Updated: 2026-03-03
 Spiderweb currently exposes multiple path "worlds" to agents:
 
 1. Host paths (for operators), e.g. `/safe/...`
-2. Acheron WorldFS paths, e.g. `/nodes/local/fs/safe/...`
+2. Acheron namespace paths, e.g. `/nodes/local/fs/safe/...`
 3. Internal sandbox paths, e.g. `/underworld/...`
 
 This is functionally workable but cognitively expensive. Agents can see different path semantics between `file_*` operations and terminal operations, which causes repeated routing mistakes and confusing operator guidance.
@@ -72,8 +72,6 @@ Canonical mounts inside the namespace:
 - `/agents` - agent-local control/services
 - `/nodes` - node/resource services
 - `/global` - global docs/templates/runtime topics
-- `/workspace` - project workspace convenience mount (optional alias)
-
 `/nodes/local/fs` remains the canonical bridge to host-mounted paths.
 
 ## 3. Namespace Operations: `mount` vs `bind`
@@ -91,8 +89,8 @@ In this model:
 
 Examples:
 
-- `mount`: attach `/nodes/local/fs/safe/Safe/ZiggyPR` to `/workspace`
-- `bind`: alias `/workspace` to `/projects/<project_id>/fs`
+- `mount`: attach `/nodes/local/fs/safe/Safe/ZiggyPR` to `/nodes/local/fs`
+- `bind`: alias one canonical namespace path to another already-mounted canonical namespace path
 
 Normative rule: `bind` must not grant access to any path/capability that is not already reachable through existing mounts and policy.
 
@@ -131,7 +129,7 @@ For operators:
 
 For agents:
 
-- Use only namespace paths (`/agents`, `/nodes`, `/global`, `/workspace`).
+- Use only namespace paths (`/agents`, `/nodes`, `/global`).
 - Do not use internal mountpoint paths.
 
 For runtime:

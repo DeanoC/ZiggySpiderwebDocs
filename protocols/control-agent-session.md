@@ -142,4 +142,4 @@ Response payload:
 Primary references:
 - `src/server_piai.zig`
 - `src/agent_registry.zig`
-- `ZiggySpiderProtocol/src/unified_types.zig`
+- `SpiderProtocol/src/unified_types.zig`

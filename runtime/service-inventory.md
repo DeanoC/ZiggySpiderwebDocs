@@ -1,6 +1,6 @@
 # Service Inventory and Usage Model (Current)
 
-This document summarizes the services that are currently implemented and how agents should discover and invoke them via Acheron WorldFS.
+This document summarizes the services that are currently implemented and how agents should discover and invoke them via the Acheron namespace.
 
 ## Discovery Order
 
@@ -46,6 +46,6 @@ Event waits can be driven through `/global/events/control/wait.json` + `/global/
 
 ## Implementation Pointers
 
-- WorldFS and service projection: `src/fsrpc_session.zig`
+- Namespace and service projection: `src/fsrpc_session.zig`
 - Node service catalog: `src/node_service_catalog.zig`, `src/fs_node_service.zig`
 - Project policy gating: `src/fs_control_plane.zig`, `src/server_piai.zig`
