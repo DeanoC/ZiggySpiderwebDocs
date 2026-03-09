@@ -47,6 +47,7 @@ Status legend:
 - Keep merge manual.
 - Current branch scope:
   - [x] Keep Spiderweb generic with a mission `contract` bundle pointing at use-case-owned workspace state.
+  - [x] Seed agent-facing mission-contract and PR Review playbook content in the Spiderweb library/templates.
   - [ ] Add PR Review mission runner/orchestration on top of that contract.
   - [ ] Surface PR Review-specific artifacts and outcomes in SpiderApp.
 
