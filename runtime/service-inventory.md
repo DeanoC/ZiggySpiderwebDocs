@@ -23,6 +23,8 @@ These Venoms are implemented by Spiderweb itself under `/global`:
 - `mounts` (project mounts/binds + local workspace folder create)
 - `sub_brains` (sub-brain list/upsert/delete)
 - `agents` (agent list/create)
+- `missions` (persistent mission lifecycle + service bridge)
+- `pr_review` (thin PR Review use-case veneer layered over `missions`)
 
 Each Venom exposes `control/*.json` endpoints plus `status.json` and `result.json` for invocation results.
 

@@ -101,6 +101,11 @@ Instead, the Spiderweb mission record should stay generic and only hold:
 
 PR Review specifics such as repo identity, PR metadata, review findings, validation output, thread state, and merge recommendation should live in the workspace or service-managed files referenced by that contract.
 
+The use case entrypoint should be a dedicated Venom layered above the generic mission Venom:
+
+- `/global/pr_review/control/start.json` creates the mission, derives contract paths, and bootstraps the initial context/state files
+- `/global/missions/*` remains the generic lifecycle substrate underneath it
+
 ## Project Configuration Model
 
 Each project using this use case should have a PR review configuration record.
