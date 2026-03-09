@@ -1,6 +1,12 @@
-# Tool System (Runtime Implementation)
+# Provider Tool Loop
 
-Spiderweb exposes tools to providers through the runtime tool loop. There is no standalone `tool.list`/`tool.call` WebSocket API for clients. Tool execution is driven by provider tool calls during `session.send` and by Acheron control files under `/global/*`.
+Spiderweb exposes a very small direct tool surface to providers through the runtime loop. There is no standalone `tool.list`/`tool.call` WebSocket API for clients.
+
+The broader system model is Acheron + Venoms:
+
+- Acheron provides filesystem-style access
+- Venoms provide actionable capability surfaces
+- provider tools stay intentionally minimal
 
 ## Provider Tool Loop
 
@@ -20,13 +26,11 @@ Direct provider schema exposure is intentionally limited:
 
 These are the only tool names accepted in `agent.control` `tool.call` while running in Acheron strict mode.
 
-### Runtime Tool Registry (Internal)
+### Internal Agent Capabilities
 
-The runtime tool registry includes additional tools used by Acheron services:
-- `search_code`
-- `shell_exec`
+Spiderweb still has internal runtime capabilities used by the agent loop, but those are not the preferred public extension model.
 
-These are invoked via `/global/search_code` and `/global/terminal` control paths rather than being exposed directly to providers.
+Public capability surfaces such as terminal, search, events, chat, and filesystem access should be reached through Venoms and Acheron paths rather than by expanding the direct provider tool list.
 
 ## Constraints & Safeguards
 
@@ -37,7 +41,8 @@ These are invoked via `/global/search_code` and `/global/terminal` control paths
 
 ## Implementation Pointers
 
-- Tool loop: `src/runtime_server.zig`
+- Tool loop: `src/agents/runtime_server.zig`
 - Tool registry/exec: `ZiggyToolRuntime/src/tool_registry.zig`, `ZiggyToolRuntime/src/tool_executor.zig`
-- Acheron service bridges: `src/fsrpc_session.zig`
+- Agent capability engine: `src/agents/capability_engine.zig`
+- Acheron session projection: `src/acheron/session.zig`
 - Runtime configuration: `src/config.zig`

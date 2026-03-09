@@ -46,7 +46,7 @@ Goal: `shell_exec`, `file_read`, `file_write`, and `file_list` all operate on on
 Primary files:
 
 - `src/sandbox_runtime.zig`
-- `src/fsrpc_session.zig`
+- `src/acheron/session.zig`
 
 Tasks:
 
@@ -67,7 +67,7 @@ Goal: each project executes inside a minimal Debian-based rootfs with overlay la
 Primary files:
 
 - `src/sandbox_runtime.zig`
-- `src/runtime_server.zig`
+- `src/agents/runtime_server.zig`
 
 Tasks:
 
@@ -86,7 +86,7 @@ Goal: strict split between capability import (`mount`) and namespace composition
 
 Primary files:
 
-- `src/fs_control_plane.zig`
+- `src/control_plane.zig`
 - `src/server_piai.zig`
 
 Tasks:
@@ -109,7 +109,7 @@ Goal: setup completion is state-driven, durable, and agent-owned (not connection
 Primary files:
 
 - `src/first_run.zig`
-- `src/agent_runtime.zig`
+- `src/agents/agent_runtime.zig`
 - `src/server_piai.zig`
 
 Tasks:

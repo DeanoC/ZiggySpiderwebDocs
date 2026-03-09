@@ -9,11 +9,11 @@ All control operations require an explicit negotiation:
 1. `control.version` with payload `{"protocol":"unified-v2"}`
 2. `control.connect`
 
-`control.version_ack` returns protocol + FS protocol hints:
+`control.version_ack` returns protocol + Acheron runtime hints:
 - `protocol` (currently `unified-v2`)
-- `fsrpc_runtime` (currently `acheron-1`)
-- `fsrpc_node` (currently `unified-v2-fs`)
-- `fsrpc_node_proto` (currently `2`)
+- `acheron_runtime` (currently `acheron-1`)
+- `acheron_node` (currently `unified-v2-fs`)
+- `acheron_node_proto` (currently `2`)
 
 `control.connect_ack` returns session binding and gating information:
 - `agent_id`
@@ -133,7 +133,7 @@ Response payload:
 ## Related Control Operations
 
 - `control.project_*`, `control.workspace_status` for project provisioning
-- `control.node_*` and `control.node_service_*` for node lifecycle and service catalog
+- `control.node_*` and `control.venom_*` for node lifecycle and Venom catalog
 - `control.auth_status`, `control.auth_rotate` for control-plane tokens
 - `control.audit_tail` for audit trail
 
@@ -141,5 +141,5 @@ Response payload:
 
 Primary references:
 - `src/server_piai.zig`
-- `src/agent_registry.zig`
+- `src/agents/agent_registry.zig`
 - `SpiderProtocol/src/unified_types.zig`

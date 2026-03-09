@@ -49,6 +49,6 @@ Admin tokens bypass project token checks. User tokens must satisfy the projectâ€
 
 ## Implementation Pointers
 
-- Control plane: `src/fs_control_plane.zig`
+- Control plane: `src/control_plane.zig`
 - Control gateway: `src/server_piai.zig`
-- Acheron namespace projection: `src/fsrpc_session.zig`
+- Acheron namespace projection: `src/acheron/session.zig`

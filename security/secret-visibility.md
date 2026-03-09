@@ -38,4 +38,4 @@ Longer-term, these static node secrets should be replaced with scoped and expiri
 
 ## Implementation Pointers
 
-- `src/fs_control_plane.zig`
+- `src/control_plane.zig`

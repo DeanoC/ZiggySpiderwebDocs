@@ -9,5 +9,5 @@ Typical hatching flow:
 3. Remove or replace `HATCH.md` once the agent is ready.
 
 Implementation pointers:
-- `src/agent_registry.zig`
-- `src/fsrpc_session.zig`
+- `src/agents/agent_registry.zig`
+- `src/acheron/session.zig`

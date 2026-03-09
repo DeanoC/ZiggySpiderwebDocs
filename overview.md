@@ -222,7 +222,7 @@ Two binaries provide the distributed filesystem protocol from `docs/design/files
   --pair-mode request \
   --node-name edge-1
 
-# Advertise terminal services + labels to node service catalog
+# Advertise terminal Venoms + labels to node Venom catalog
 ./zig-out/bin/spiderweb-fs-node \
   --export work=.:rw \
   --control-url ws://127.0.0.1:18790/ \

@@ -83,7 +83,7 @@ Spiderweb should adopt Inferno/Plan9-style semantics with a strict distinction:
 
 In this model:
 
-- `/nodes` is a service catalog and discovery surface.
+- `/nodes` is a Venom catalog and discovery surface.
 - `mount` is the action that attaches catalog resources into the active namespace.
 - `bind` is the action that reshapes an already attached namespace view without adding new capability.
 
@@ -220,6 +220,6 @@ Modern additions are:
 ## Implementation Pointers
 
 - Runtime/sandbox assembly: `src/sandbox_runtime.zig`
-- Agent/worldfs projection: `src/fsrpc_session.zig`
-- Control-plane mounts/projects: `src/fs_control_plane.zig`
+- Agent/Acheron namespace projection: `src/acheron/session.zig`
+- Control-plane mounts/projects: `src/control_plane.zig`
 - Gateway/session attach flow: `src/server_piai.zig`

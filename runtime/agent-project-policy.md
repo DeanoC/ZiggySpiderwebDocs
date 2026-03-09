@@ -39,7 +39,7 @@ Service-level invoke also requires service permissions (`PERMISSIONS.json`) and 
 
 ## Related Sources
 
-- `src/fs_control_plane.zig`
+- `src/control_plane.zig`
 - `src/server_piai.zig`
 - `docs/security/auth-session-safety.md`
 - `docs/security/secret-visibility.md`

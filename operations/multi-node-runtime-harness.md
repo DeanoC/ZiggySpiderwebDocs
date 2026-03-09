@@ -32,7 +32,7 @@ Run a Linux node with manifests enabled (example):
   --control-auth-token "<admin-token>" \
   --pair-mode request \
   --node-name "linux-edge" \
-  --services-dir ./examples/services.d
+  --venoms-dir ./examples/services.d
 ```
 
 Approve pairing if running in request mode:
@@ -60,7 +60,7 @@ On Windows (PowerShell):
   --pair-mode invite `
   --invite-token "<invite-token>" `
   --node-name "win-edge" `
-  --services-dir ".\examples\services.d"
+  --venoms-dir ".\examples\services.d"
 ```
 
 ## 4) Automated Harness Script
@@ -81,15 +81,15 @@ PERSISTENCE_SERVICE_ID=echo-main \
 What it checks:
 
 - expected nodes mount into workspace view
-- expected services exist in `control.node_service_get`
+- expected Venoms exist in `control.venom_get`
 - runtime surface exists (`config.json`, `status.json`, `health.json`)
 - reconnect flap (offline -> online) for `RECONNECT_NODE_ID`
 - persistence marker survives reconnect/startup for target service
 
 ## 5) Manifest Hot Reload Check
 
-While node is running, edit a manifest in `--services-dir` (or a file given via
-`--service-manifest`) and wait for the reload interval (default 2000ms, set via
+While node is running, edit a manifest in `--venoms-dir` (or a file given via
+`--venom-manifest`) and wait for the reload interval (default 2000ms, set via
 `--manifest-reload-interval-ms`).
 
 Then verify catalog update:

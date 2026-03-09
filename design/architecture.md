@@ -6,24 +6,24 @@ This document reflects the runtime architecture as implemented in this repo.
 
 - **WebSocket gateway** (`src/server_piai.zig`)
   - Accepts connections, negotiates unified-v2 control + Acheron runtime.
-  - Handles control-plane ops (auth, sessions, projects, nodes, service catalog).
+  - Handles control-plane ops (auth, sessions, projects, nodes, Venom catalog).
 
-- **Runtime server** (`src/runtime_server.zig`)
+- **Runtime server** (`src/agents/runtime_server.zig`)
   - Executes chat and tool-call loops.
   - Enforces tool-call constraints and emits debug frames.
 
-- **Acheron Namespace Session** (`src/fsrpc_session.zig`)
+- **Acheron Namespace Session** (`src/acheron/session.zig`)
   - Projects control-plane state into the agent-visible namespace.
-  - Hosts first-class services under `/global/*` and node resources under `/nodes/*`.
+  - Hosts first-class Venoms under `/global/*` and node resources under `/nodes/*`.
 
-- **Control plane** (`src/fs_control_plane.zig`)
+- **Control plane** (`src/control_plane.zig`)
   - Projects, mounts, tokens, node registry, and workspace topology.
 
 - **Sandbox runtime** (`src/sandbox_runtime.zig`)
   - Optional sandboxing for runtime tool execution (Linux + bubblewrap).
 
-- **Node FS runtime** (`src/fs_node_*`)
-  - Node-side filesystem protocol and service export surface.
+- **Node FS runtime** (`deps/spider-protocol/src/spiderweb_node/*`)
+  - Shared node-side filesystem protocol and Venom export surface.
 
 ## Concurrency Model
 
@@ -53,12 +53,12 @@ Key config fields (see `src/config.zig`):
 ## Observability
 
 - Debug stream frames can be logged to `<ltm>/debug-stream.ndjson`.
-- Node service events can be logged to `<ltm>/node-service-events.ndjson`.
+- Node Venom events can be logged to `<ltm>/node-venom-events.ndjson`.
 
 ## Implementation Pointers
 
 - `src/server_piai.zig`
-- `src/runtime_server.zig`
-- `src/fsrpc_session.zig`
-- `src/fs_control_plane.zig`
+- `src/agents/runtime_server.zig`
+- `src/acheron/session.zig`
+- `src/acheron/control_plane.zig`
 - `src/config.zig`

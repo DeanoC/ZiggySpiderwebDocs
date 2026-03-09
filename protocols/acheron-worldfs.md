@@ -12,7 +12,7 @@ The Acheron namespace is the agent-visible filesystem exposed over the `acheron-
 │       └── LINK.txt (for visible peer agents)
 ├── nodes/
 │   └── <node_id>/
-│       ├── services/<service_id>/...
+│       ├── venoms/<venom_id>/...
 │       └── <resource_roots...>
 ├── global/
 │   ├── chat/
@@ -26,22 +26,22 @@ The Acheron namespace is the agent-visible filesystem exposed over the `acheron-
 │   ├── sub_brains/...
 │   ├── agents/...
 │   ├── projects/...
-│   ├── services/SERVICES.json
+│   ├── venoms/VENOMS.json
 │   └── library/...
 └── debug/ (only when enabled by policy)
 ```
 
 `acheron.t_attach` returns `layout="unified-v2-fs"` plus the canonical roots exposed to the session.
 
-## Agent Namespace Services
+## Agent Namespace Venoms
 
-Service discovery starts at:
+Venom discovery starts at:
 
-- `/global/services/SERVICES.json`
+- `/global/venoms/VENOMS.json`
 
-Each service directory contains a contract set (`README.md`, `SCHEMA.json`, `CAPS.json`, `OPS.json`, `PERMISSIONS.json`, `STATUS.json`) plus `control/*.json`, `status.json`, and `result.json` for invocation.
+Each Venom directory contains a contract set (`README.md`, `SCHEMA.json`, `CAPS.json`, `OPS.json`, `PERMISSIONS.json`, `STATUS.json`) plus `control/*.json`, `status.json`, and `result.json` for invocation.
 
-Implemented services:
+Implemented built-in Venoms:
 - `memory`
 - `web_search`
 - `search_code`
@@ -70,12 +70,12 @@ Supported event sources include:
 - `/global/events/sources/hook/<parameter>.json`
 - `/global/events/sources/user/<parameter>.json`
 
-## Node Services
+## Node Venoms
 
-Node services are projected from the control-plane catalog into:
+Node Venoms are projected from the control-plane catalog into:
 
-- `/nodes/<node_id>/services/<service_id>`
-- `/nodes/<node_id>/<resource>` (compat view derived from service mounts)
+- `/nodes/<node_id>/venoms/<venom_id>`
+- `/nodes/<node_id>/<resource>` (compat view derived from Venom mounts)
 
 If a node advertises an explicit empty catalog, no fallback resources are exposed for that node.
 
@@ -96,6 +96,6 @@ When debug is enabled by policy (typically for `mother`), `/debug/` exposes pair
 
 ## Implementation Pointers
 
-- Namespace session: `src/fsrpc_session.zig`
-- Policy defaults: `src/world_policy.zig`
-- Control-plane topology: `src/fs_control_plane.zig`
+- Namespace session: `src/acheron/session.zig`
+- Policy defaults: `src/workspaces/policy.zig`
+- Control-plane topology: `src/acheron/control_plane.zig`

@@ -29,7 +29,7 @@ The node runtime supports multiple source adapters via the `SourceAdapter` contr
 - `gdrive` (Google Drive)
 - `namespace` (synthetic namespace sources)
 
-Adapters are wired through `src/fs_source_adapter*.zig` and the router in `src/fs_router.zig`.
+Adapters are wired through `src/fs_source_adapter*.zig` and the router in `src/router.zig`.
 
 ### Google Drive (GDrive)
 
@@ -41,6 +41,6 @@ GDrive support is implemented in `src/fs_gdrive_backend.zig` and adapters:
 ### Implementation Pointers
 
 - Node runtime: `src/fs_node_main.zig`, `src/fs_node_server.zig`, `src/fs_node_ops.zig`
-- Router + adapters: `src/fs_router.zig`, `src/fs_source_adapter*.zig`
-- Mount client: `src/fs_fuse_adapter.zig`, `src/fs_mount_main.zig`
-- Protocol types: `src/fs_protocol.zig`
+- Router + adapters: `src/router.zig`, `src/fs_source_adapter*.zig`
+- Mount client: `src/fs_fuse_adapter.zig`, `src/mount_main.zig`
+- Protocol types: `src/protocol.zig`

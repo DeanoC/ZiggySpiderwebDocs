@@ -33,6 +33,6 @@ If `HATCH.md` exists, the agent is considered unhatched and may require bootstra
 
 ## Implementation Pointers
 
-- Registry: `src/agent_registry.zig`
+- Registry: `src/agents/agent_registry.zig`
 - Identity loader: `src/identity.zig`
 - Control responses: `src/server_piai.zig`

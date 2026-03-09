@@ -12,6 +12,6 @@ The WebSocket gateway enforces unified-v2 control negotiation and maintains per-
 
 ## Implementation Pointers
 
-- Acheron session & jobs: `src/fsrpc_session.zig`
-- Runtime server: `src/runtime_server.zig`
+- Acheron session & jobs: `src/acheron/session.zig`
+- Runtime server: `src/agents/runtime_server.zig`
 - Gateway/session handling: `src/server_piai.zig`

@@ -6,7 +6,7 @@ This folder contains the maintained docs for Spiderweb. Files are grouped by top
 - `../README.md` - build, install, and quick usage
 - `overview.md` - vision, architecture, protocols, configuration, and FS runtime examples
 - `protocols/control-agent-session.md` - unified-v2 control handshake, agent discovery, and session control
-- `protocols/acheron-worldfs.md` - Acheron namespace layout and service contracts
+- `protocols/acheron-worldfs.md` - Acheron namespace layout and Venom contracts
 - `runtime/tool-system.md` - provider-driven tool loop and tool constraints
 
 ## Architecture & Design
@@ -18,7 +18,7 @@ This folder contains the maintained docs for Spiderweb. Files are grouped by top
 - `design/filesystem-sources.md` - source adapters and routing behavior
 - `design/agents/agent-design.md` - agent identity + registry model
 - `design/agents/agent-loop.md` - runtime/agent loop mechanics
-- `design/agents/brain-tools.md` - tool naming and dispatch
+- `design/agents/agent-capabilities.md` - internal capability-engine naming and dispatch
 - `design/agents/memory.md` - memory schemas + Acheron paths
 - `design/agents/hatch.md` - bootstrap/hatching behavior
 - `design/glossary.md` - shared terminology

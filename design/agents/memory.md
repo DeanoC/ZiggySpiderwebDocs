@@ -30,4 +30,4 @@ The runtime seeds system instructions and loop/tool contracts on boot (see `src/
 
 - Memory schema + seeds: `src/memory_schema.zig`
 - Memory store: `ziggy-memory-store`
-- Acheron bridge: `src/fsrpc_session.zig`
+- Acheron bridge: `src/acheron/session.zig`

@@ -16,7 +16,7 @@ Each adapter advertises capability hints (case sensitivity, native watch, xattr,
 
 ## Router Behavior
 
-The router (`src/fs_router.zig`) chooses a target export for each operation based on:
+The router (`src/router.zig`) chooses a target export for each operation based on:
 
 - read/write intent
 - export capability flags
@@ -36,7 +36,7 @@ Exports include metadata used by the router and mount client:
 
 ## Implementation Pointers
 
-- `src/fs_router.zig`
+- `src/router.zig`
 - `src/fs_source_policy.zig`
 - `src/fs_source_adapter.zig`
 - `src/fs_source_adapter_factory.zig`
