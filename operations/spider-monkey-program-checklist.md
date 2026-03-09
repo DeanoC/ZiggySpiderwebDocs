@@ -53,7 +53,7 @@ Status legend:
   - [x] Add review-specific venom operations for state sync plus validation/review artifact recording.
   - [x] Add first-class `git` and `github_pr` service venoms for checkout sync, diff inspection, provider PR sync, and top-level review publication dry runs.
   - [x] Add deeper PR Review runner/orchestration on top of that venom and contract.
-  - [ ] Surface PR Review-specific artifacts and outcomes in SpiderApp.
+  - [x] Surface PR Review-specific artifacts and outcomes in SpiderApp.
 
 ## Definition of done for this checklist
 
