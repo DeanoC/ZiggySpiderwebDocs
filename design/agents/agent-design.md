@@ -4,7 +4,7 @@ Agents are defined by directories under `agents/` and loaded by the runtime regi
 
 ## Identity Layers
 
-Identity prompts are composed from layered files (in order):
+Initial identity prompts are seeded from persona-pack files and composed from layered files (in order):
 
 - `SOUL.md`
 - `AGENT.md`
@@ -13,26 +13,32 @@ Identity prompts are composed from layered files (in order):
 
 Only the first occurrence of a heading is kept across layers; later duplicates are skipped to avoid conflicts.
 
-If no identity files exist, a fallback prompt is used.
+After seeding, the runtime loads these files into managed identity memories. `CORE.md` remains system-managed, while the agent-owned identity may evolve over time.
 
 ## `agent.json`
 
-If present, `agent.json` supplies structured metadata (name, description, capabilities, default flag). If missing, metadata is inferred from identity files.
+If present, `agent.json` supplies structured metadata such as:
+
+- `persona_pack`
+- `name`
+- `description`
+- `capabilities`
+- `is_default`
+
+If metadata is missing, the registry falls back to identity-file inference.
 
 ## Registry & Discovery
 
 The agent registry:
 
 - scans `agents/<agent_id>/` directories
-- tracks `identity_loaded` and `needs_hatching`
+- tracks `identity_loaded`
+- tracks `persona_pack` when recorded in `agent.json`
 - exposes `control.agent_list` / `control.agent_get`
-
-## Hatching
-
-If `HATCH.md` exists, the agent is considered unhatched and may require bootstrap steps.
 
 ## Implementation Pointers
 
 - Registry: `src/agents/agent_registry.zig`
 - Identity loader: `src/identity.zig`
+- Persona seeding: `src/agents/system_hooks.zig`
 - Control responses: `src/server_piai.zig`

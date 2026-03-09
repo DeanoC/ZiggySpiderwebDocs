@@ -16,7 +16,7 @@ What this checks:
 2. A real provider-backed Mother reply is produced over Acheron chat.
 3. First project is created with required `vision`.
 4. First non-system agent is created via Acheron (`/global/agents/control/create.json`).
-5. Created agent has `agent.json` + `HATCH.md` scaffold.
+5. Created agent has seeded persona files (`SOUL.md`, `AGENT.md`, `IDENTITY.md`) and optional `agent.json`.
 6. `control.session_attach` to the new project/agent succeeds.
 7. Post-bootstrap `control.connect` reports `bootstrap_only=false`.
 

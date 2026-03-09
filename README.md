@@ -20,7 +20,7 @@ This folder contains the maintained docs for Spiderweb. Files are grouped by top
 - `design/agents/agent-loop.md` - runtime/agent loop mechanics
 - `design/agents/agent-capabilities.md` - internal capability-engine naming and dispatch
 - `design/agents/memory.md` - memory schemas + Acheron paths
-- `design/agents/hatch.md` - bootstrap/hatching behavior
+- `design/agents/persona-packs.md` - persona-pack seeding and mutable identity model
 - `design/glossary.md` - shared terminology
 
 ## Protocols
@@ -44,6 +44,7 @@ This folder contains the maintained docs for Spiderweb. Files are grouped by top
 - `operations/multi-node-runtime-harness.md`
 - `operations/node-pairing-approval.md`
 - `operations/node-service-watch-alerting.md`
+- `operations/spider-monkey-program-checklist.md`
 - `operations/unified-v2-release-checklist.md`
 
 If you find drift, update the doc and add a short “Source” or “Implementation” note pointing to the relevant Zig files.

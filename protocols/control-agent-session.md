@@ -40,7 +40,7 @@ Agent fields:
 - `description`
 - `is_default`
 - `identity_loaded`
-- `needs_hatching`
+- `persona_pack` (nullable)
 - `capabilities` (array of `chat`, `code`, `plan`, `research`)
 
 Errors:
