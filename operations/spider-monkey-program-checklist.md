@@ -26,7 +26,7 @@ Status legend:
 
 ## Phase 2: Service-Venom Runtime
 
-### [ ] PR-SM4 (SpiderProtocol/SpiderNode): durable service venom contract
+### [x] PR-SM4 (SpiderProtocol/SpiderNode): durable service venom contract
 - Standardize service manifests, supervision, restart, and status reporting for long-running agent work.
 - Ensure Git/GitHub, terminal, search, testing, and future services are consumable as discoverable workspace services.
 

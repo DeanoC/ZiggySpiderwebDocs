@@ -7,7 +7,7 @@ This document summarizes the Venoms that are currently implemented and how agent
 1. `/global/venoms/VENOMS.json` (agent namespace index)
 2. `/nodes/<node_id>/venoms/VENOMS.json` (node-scoped catalog, if advertised)
 3. Inspect Venom contract files before invoking:
-   - `README.md`, `SCHEMA.json`, `TEMPLATE.json`, `CAPS.json`, `OPS.json`, `PERMISSIONS.json`, `STATUS.json`
+   - `README.md`, `SCHEMA.json`, `TEMPLATE.json`, `HOST.json`, `CAPS.json`, `OPS.json`, `PERMISSIONS.json`, `STATUS.json`
 
 ## Agent Namespace Venoms (Implemented)
 
@@ -38,9 +38,10 @@ If a node advertises an empty Venom list, no fallback resources are exposed for 
 ## Invoke Contract
 
 1. Read `OPS.json` for the `invoke` target (or `paths.invoke`).
-2. If needed, seed a payload from `TEMPLATE.json`.
-3. Write the payload to the invoke path.
-4. Read `status.json` and `result.json` until completion.
+2. Read `HOST.json` to understand runtime contract and supervision behavior.
+3. If needed, seed a payload from `TEMPLATE.json`.
+4. Write the payload to the invoke path.
+5. Read `status.json` and `result.json` until completion.
 
 Event waits can be driven through `/global/events/control/wait.json` + `/global/events/next.json`.
 

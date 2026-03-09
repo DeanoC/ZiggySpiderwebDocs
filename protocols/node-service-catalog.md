@@ -41,6 +41,7 @@ Each Venom entry:
 - `runtime` (`object`, optional, default `{}`)
 - `permissions` (`object`, optional, default `{}`)
 - `schema` (`object`, optional, default `{}`)
+- `invoke_template` (`object`, optional)
 - `help_md` (`string`, optional)
 
 ### Example
@@ -70,6 +71,7 @@ Each Venom entry:
       "runtime": { "type": "native_proc", "abi": "namespace-driver-v1" },
       "permissions": { "default": "deny-by-default" },
       "schema": { "model": "namespace-mount" },
+      "invoke_template": { "op": "capture", "arguments": { "mode": "still" } },
       "help_md": "Camera namespace driver"
     }
   ]
@@ -100,7 +102,25 @@ Subscribes to catalog events. Server responds with `control.venom_event` frames 
 - `capabilities` must be a JSON object.
 - `mounts`, when present, must use absolute `mount_path` values.
 - `ops`, `runtime`, `permissions`, and `schema` must be JSON objects.
+- `invoke_template`, when present, must be a JSON object.
 - `ops.invoke` / `ops.paths.invoke`, when provided, override the default `control/invoke.json` resolve path.
+
+## Mirrored Namespace Contract
+
+Acheron mirrors node catalog entries into `/nodes/<node_id>/venoms/<venom_id>` with these contract files when available:
+
+- `README.md`
+- `SCHEMA.json`
+- `TEMPLATE.json`
+- `CAPS.json`
+- `MOUNTS.json`
+- `OPS.json`
+- `RUNTIME.json`
+- `HOST.json`
+- `PERMISSIONS.json`
+- `STATUS.json`
+
+`HOST.json` is synthesized from `runtime.type` using the shared service runtime host contract, so operator and agent tooling can inspect runtime/supervision capabilities even though the control-plane catalog does not transmit `HOST.json` directly.
 
 ## Namespace Permission Projection
 
@@ -137,6 +157,7 @@ When `spiderweb-fs-node` runs in control daemon mode (`--control-url`), it auto-
   - capabilities: `pty=true`, `terminal_id`, `invoke=true`
   - ops: `invoke=control/invoke.json` (`paths.exec` alias)
   - runtime: `native_proc` (`entry=internal-terminal-invoke`)
+  - invoke template: `terminal_exec`
   - mounts: `/nodes/<node_id>/terminal/<id>`
 - Extra namespace Venoms (from `--venom-manifest` / `--venoms-dir`):
   - appended after built-in providers
