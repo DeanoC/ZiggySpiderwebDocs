@@ -30,7 +30,7 @@ Status legend:
 - Standardize service manifests, supervision, restart, and status reporting for long-running agent work.
 - Ensure Git/GitHub, terminal, search, testing, and future services are consumable as discoverable workspace services.
 
-### [ ] PR-SM5 (Spiderweb): mission-to-service binding
+### [x] PR-SM5 (Spiderweb): mission-to-service binding
 - Bind mission steps to service venoms instead of hard-coded workflow branches.
 - Record artifacts and step events uniformly.
 

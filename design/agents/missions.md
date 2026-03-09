@@ -11,6 +11,7 @@ Use mission control files instead of ad-hoc runtime state:
 - `/global/missions/control/get.json`
 - `/global/missions/control/heartbeat.json`
 - `/global/missions/control/checkpoint.json`
+- `/global/missions/control/invoke_service.json`
 - `/global/missions/control/recover.json`
 - `/global/missions/control/request_approval.json`
 - `/global/missions/control/approve.json`
@@ -26,6 +27,15 @@ Results and status:
 - `/global/missions/result.json`
 - `/global/missions/status.json`
 
+`invoke_service.json` is the bridge from mission steps to workspace-mounted service venoms. Provide:
+
+- `mission_id`
+- `service_path` for the venom root, for example `/global/memory`
+- either a raw `payload` / `request` body or an `op` plus `arguments`
+- optional `invoke_path` when the discovered service exposes a non-default invoke target
+
+Spiderweb resolves the service invoke path, writes through the live Acheron venom interface, then records the request, result, status, artifact, and mission event uniformly.
+
 ## Mission Record Shape
 
 Each mission record persists:
@@ -35,6 +45,11 @@ Each mission record persists:
 - `created_by`, `created_at_ms`, `updated_at_ms`, and `last_heartbeat_ms`
 - `checkpoint_seq`, `recovery_count`, `recovery_reason`, `blocked_reason`, and `summary`
 - recent `artifacts`, recent `events`, and optional `pending_approval`
+
+Service-bound mission steps emit:
+
+- a `mission.service_invoked` event with service path, invoke path, request, result, status, artifact, and actor
+- a mission artifact entry, defaulting to the service `result.json` path unless overridden
 
 Current states:
 
