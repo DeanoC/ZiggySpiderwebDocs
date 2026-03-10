@@ -1,6 +1,6 @@
 # Missions (Current)
 
-Spiderweb now exposes a first-class mission venom backed by a persistent mission store. Workspace-facing agents should prefer `/services/missions` when the active project binds it; `/global/missions` remains the current local-service origin.
+Spiderweb now exposes a first-class mission venom backed by a persistent mission store. Workspace-facing agents should prefer `/services/missions` when the active project binds it; `/nodes/local/venoms/missions` is the canonical local origin, and `/global/missions` is the compatibility alias.
 
 ## Access Paths
 

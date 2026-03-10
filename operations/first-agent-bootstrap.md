@@ -44,7 +44,7 @@ Run:
 What this additionally checks:
 
 1. Mother performs project + agent provisioning from chat/tool execution (not only external control calls).
-2. Mother executes mount/bind/resolve through `/global/mounts/control/*.json`.
+2. Mother executes mount/bind/resolve through `/services/mounts/control/*.json`, falling back to `/nodes/local/venoms/mounts/*` only when no workspace bind exists yet.
 3. Script verifies resulting mount/bind state and successful `session_attach` to the Mother-created context.
 
 Modes:

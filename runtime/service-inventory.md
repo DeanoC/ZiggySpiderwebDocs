@@ -40,7 +40,7 @@ Each Venom exposes `control/*.json` endpoints plus `status.json` and `result.jso
 
 Projects now carry a `template_id` that seeds their initial workspace service binds:
 
-- `minimum`: binds `/services/mounts -> /global/mounts`
+- `minimum`: binds `/services/mounts -> /nodes/local/venoms/mounts`
 - `github`: binds `/services/mounts`, `/services/git`, `/services/github_pr`, `/services/missions`, and `/services/pr_review`
 
 The effective bound surface for a project is emitted through:

@@ -18,7 +18,7 @@ Spiderweb exposes a unified project workspace by routing file operations over We
 
 ### Workspace Templates (Current)
 
-- `minimum` seeds only the essential workspace-management bind: `/services/mounts -> /global/mounts`
+- `minimum` seeds only the essential workspace-management bind: `/services/mounts -> /nodes/local/venoms/mounts`
 - `github` seeds repository-review services on top of that minimum set:
   - `/services/git`
   - `/services/github_pr`
