@@ -118,7 +118,7 @@ The use case entrypoint should be a dedicated Venom layered above the generic mi
 - `/services/git/*` and `/services/github_pr/*` provide the repo/provider actions that PR Review orchestration should call instead of dropping to raw shell glue
 - `/services/missions/*` remains the generic lifecycle substrate underneath it when that workspace template binds it
 
-These `/services/*` paths are the project-facing bind targets. The current local implementation still originates many of those Venoms under `/global/*`, but agents should prefer the bound workspace paths whenever they exist.
+These `/services/*` paths are the project-facing bind targets. The canonical local implementation now originates those Venoms under `/nodes/local/venoms/*`, with `/global/*` retained as a compatibility alias. Agents should prefer the bound workspace paths whenever they exist.
 
 ## Project Configuration Model
 

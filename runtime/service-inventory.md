@@ -6,16 +6,16 @@ This document summarizes the Venoms that are currently implemented and how agent
 
 1. `/projects/<project_id>/meta/mounted_services.json` (effective workspace service index)
 2. `/services/*` paths bound into the current workspace by the active project template and later mount/bind changes
-3. `/global/venoms/VENOMS.json` (current local-service index)
+3. `/global/venoms/VENOMS.json` (compatibility discovery index for local aliases)
 4. `/nodes/<node_id>/venoms/VENOMS.json` (node-scoped catalog, if advertised)
 5. Inspect Venom contract files before invoking:
    - `README.md`, `SCHEMA.json`, `TEMPLATE.json`, `HOST.json`, `CAPS.json`, `OPS.json`, `PERMISSIONS.json`, `STATUS.json`
 
-`/global/*` remains the current implementation origin for many local services, but project-facing agent workflows should prefer the workspace-bound `/services/*` paths when they are present.
+Spiderweb now publishes its built-in local venoms canonically under `/nodes/local/venoms/*`. `/global/*` remains a compatibility alias, but project-facing agent workflows should prefer `/services/*` when those binds are present.
 
 ## Agent Namespace Venoms (Implemented)
 
-These Venoms are implemented by Spiderweb itself under `/global`:
+These Venoms are implemented by Spiderweb itself under `/nodes/local/venoms/*`, with `/global/*` retained as a compatibility alias:
 
 - `chat` (input under `/global/chat/control/input`)
 - `jobs` (status/result under `/global/jobs/<job_id>/*`)
