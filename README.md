@@ -1,50 +1,43 @@
-# Spiderweb Documentation
+# Spider Ecosystem Handbook
 
-This folder contains the maintained docs for Spiderweb. Files are grouped by topic; older design notes have been refreshed and moved under `docs/design/`.
+This repository is the current handbook for the Spider ecosystem.
+
+It describes the system as it exists now:
+
+- `Spiderweb` is the hosted distributed workspace OS and namespace host.
+- `SpiderMonkey` is the first-party external worker process.
+- `SpiderProtocol` owns the canonical wire contracts, generated SDK inputs, fixtures, and shared runtime substrate.
+- `SpiderNode` packages standalone node daemons that extend the namespace.
+- `SpiderApp` is a client and operator surface, not the center of the architecture.
+
+This handbook intentionally replaces old design notes and stale worldview documents. If a concept is not described here, do not assume it is part of the current supported model.
 
 ## Start Here
-- `../README.md` - build, install, and quick usage
-- `overview.md` - vision, architecture, protocols, configuration, and FS runtime examples
-- `protocols/control-agent-session.md` - unified-v2 control handshake, agent discovery, and session control
-- `protocols/acheron-worldfs.md` - Acheron namespace layout and Venom contracts
-- `runtime/tool-system.md` - provider-driven tool loop and tool constraints
 
-## Architecture & Design
-- `architecture/rfc-project-rootfs-and-namespace-unification.md` - proposed namespace/rootfs architecture RFC
-- `architecture/implementation-plan-hard-cut-unified-namespace.md` - execution plan for hard-cut migration (no backward compatibility)
-- `design/architecture.md` - current runtime architecture and threading model
-- `design/projects.md` - project model and workspace topology as implemented
-- `design/filesystem.md` - distributed FS runtime and node/mount flow
-- `design/filesystem-sources.md` - source adapters and routing behavior
-- `design/agents/agent-design.md` - agent identity + registry model
-- `design/agents/agent-loop.md` - runtime/agent loop mechanics
-- `design/agents/agent-capabilities.md` - internal capability-engine naming and dispatch
-- `design/agents/memory.md` - memory schemas + Acheron paths
-- `design/agents/persona-packs.md` - persona-pack seeding and mutable identity model
-- `design/glossary.md` - shared terminology
+1. [Overview](overview.md)
+2. [Repository Map](ecosystem/repo-map.md)
+3. [System Architecture](architecture/system-architecture.md)
+4. [Quickstart: Workspace Host](operations/quickstart-workspace-host.md)
 
-## Protocols
-- `protocols/control-agent-session.md`
-- `protocols/node-service-catalog.md`
-- `protocols/acheron-worldfs.md`
-- `protocols/unified-v2-fs-migration.md`
+## What This Handbook Covers
 
-## Runtime & Policy
-- `runtime/agent-project-policy.md`
-- `runtime/tool-system.md`
-- `runtime/service-inventory.md`
+- how the Spider repos fit together
+- how Spiderweb projects a workspace namespace
+- how workers, services, mounts, and nodes interact
+- how to run the current Linux or WSL hosted flow
+- where the canonical protocol and SDK references live
 
-## Security
-- `security/auth-session-safety.md`
-- `security/secret-visibility.md`
-- `security/review-policy.md`
+## What This Handbook Does Not Do
 
-## Operations
-- `operations/first-agent-bootstrap.md`
-- `operations/multi-node-runtime-harness.md`
-- `operations/node-pairing-approval.md`
-- `operations/node-service-watch-alerting.md`
-- `operations/spider-monkey-program-checklist.md`
-- `operations/unified-v2-release-checklist.md`
+- duplicate protocol message tables that already live in `SpiderProtocol`
+- preserve historical RFCs, TODOs, or speculative design notes as current guidance
+- describe Spiderweb as an embedded agent AI runtime
+- describe provider keys or model configuration as a Spiderweb concern
 
-If you find drift, update the doc and add a short “Source” or “Implementation” note pointing to the relevant Zig files.
+## Core Repositories
+
+- [Spiderweb](https://github.com/DeanoC/Spiderweb): workspace host, control plane, mount client, built-in workspace services
+- [SpiderMonkey](https://github.com/DeanoC/SpiderMonkey): first-party external worker
+- [SpiderProtocol](https://github.com/DeanoC/SpiderProtocol): protocol library, SDK artifacts, canonical protocol docs, node runtime substrate
+- [SpiderNode](https://github.com/DeanoC/SpiderNode): standalone node runtime packaging
+- [SpiderApp](https://github.com/DeanoC/SpiderApp): operator and client surface
