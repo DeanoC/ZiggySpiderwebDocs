@@ -1,87 +1,48 @@
-# Mother Bootstrap Runbook
+# Workspace Bootstrap Runbook
 
-This runbook validates first-boot behavior where only `mother` + `system` exist, then verifies first project/agent provisioning.
+Spiderweb no longer performs Mother/system bootstrap or provider-backed onboarding internally. Bootstrap is now workspace-first and external-worker-driven.
 
-## Fast Path: Provider-Backed Manual Canary
+## Manual Flow
 
-Run:
-
-```bash
-./scripts/manual-mother-provider-canary.sh
-```
-
-What this checks:
-
-1. `control.connect` returns `control.connect_ack` bound to `mother/system` with `bootstrap_only=true`.
-2. A real provider-backed Mother reply is produced over Acheron chat.
-3. First project is created with required `vision`.
-4. First non-system agent is created via Acheron (`/global/agents/control/create.json`).
-5. Created agent has seeded persona files (`SOUL.md`, `AGENT.md`, `IDENTITY.md`) and optional `agent.json`.
-6. `control.session_attach` to the new project/agent succeeds.
-7. Post-bootstrap `control.connect` reports `bootstrap_only=false`.
-
-If it fails with `provider request invalid`, fix provider credentials/model in:
-
-- `~/.config/spiderweb/config.json`
-
-and rerun.
-
-Useful options:
+1. Start Spiderweb.
+2. Reveal the admin token:
 
 ```bash
-KEEP_CANARY_DIR=1 ./scripts/manual-mother-provider-canary.sh
-CANARY_PROVIDER_NAME=openai CANARY_PROVIDER_MODEL=gpt-4o-mini ./scripts/manual-mother-provider-canary.sh
+spiderweb-config auth status --reveal
 ```
 
-## Mother-Driven Operations E2E
-
-Run:
+3. Create a workspace:
 
 ```bash
-./scripts/manual-mother-agent-e2e.sh
+spiderweb-control --url ws://127.0.0.1:18790/ --auth-token <admin-token> workspace_create '{"name":"Demo","vision":"Mounted workspace"}'
 ```
 
-What this additionally checks:
-
-1. Mother performs project + agent provisioning from chat/tool execution (not only external control calls).
-2. Mother executes mount/bind/resolve through `/services/mounts/control/*.json`, falling back to `/nodes/local/venoms/mounts/*` only when no workspace bind exists yet.
-3. Script verifies resulting mount/bind state and successful `session_attach` to the Mother-created context.
-
-Modes:
-
-- `MOTHER_E2E_MODE=provider_chat` (default): real Mother/tool workflow.
-- `MOTHER_E2E_MODE=deterministic`: direct control-file path (useful for CI and isolated debugging).
-
-Examples:
+4. Mount the workspace locally:
 
 ```bash
-MOTHER_E2E_MODE=deterministic ./scripts/manual-mother-agent-e2e.sh
-MOTHER_E2E_MODE=provider_chat CANARY_PROVIDER_NAME=openai-codex CANARY_PROVIDER_MODEL=gpt-5.3-codex ./scripts/manual-mother-agent-e2e.sh
+spiderweb-fs-mount --workspace-url ws://127.0.0.1:18790/ --auth-token <admin-token> --workspace-id <workspace-id> mount ./workspace
 ```
 
-Run deterministic first, then real Mother mode in one command:
+5. Start Spider Monkey, or another filesystem-capable worker, against that mounted directory.
 
-```bash
-./scripts/mother-agent-e2e-suite.sh
-```
+## What Spiderweb Owns
 
-In CI, provider-chat is auto-gated:
+- Workspace creation and control-plane state.
+- Mounted namespace projection.
+- Shared services such as `/services/mounts`, `/services/home`, and `/services/workers`.
+- Durable queued jobs for external workers.
 
-- runs when Codex auth (`~/.codex/auth.json`) exists, or provider secrets are present
-- otherwise runs deterministic mode only
+## What External Workers Own
 
-## Protocol Notes (Current Behavior)
+- AI provider/model configuration.
+- Agent runtime execution.
+- Worker-private node venoms such as memory and sub-brains.
+- Per-agent homes and worker lifecycle within the mounted namespace.
 
-- `control.connect` returns `control.connect_ack` even when context selection is needed.
-- Context gating is exposed in payload fields:
-  - `requires_session_attach`
-  - `connect_gate` (`code`/`message`)
-- Bootstrap mode indicator:
-  - `bootstrap_only=true`
-  - non-null `bootstrap_message`
+## Removed Legacy Flow
 
-## Important Constraints
+The old Mother/provider canaries and bootstrap scripts were removed during the Spider Monkey split. If you need equivalent validation now, use:
 
-- Mother is system-locked (`project_id=system`) and user role cannot attach to Mother.
-- Project creation requires non-empty `vision`.
-- Unified-v2 control rejects legacy websocket chat envelopes such as `chat.send`.
+- `./scripts/acheron-smoke.sh`
+- `./scripts/acheron-namespace-smoke.sh`
+- a real mounted workspace plus Spider Monkey
