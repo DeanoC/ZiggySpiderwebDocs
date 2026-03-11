@@ -33,9 +33,11 @@ The first usable slice should support a single GitHub repository and a single Sp
 
 This spec assumes the current Spider runtime model described elsewhere in this repo:
 
-- agent-visible paths should use canonical namespace paths only, primarily `/agents`, `/nodes`, and `/global`
-- project lifecycle and topology are managed through `/global/projects/control/*.json`
+- agent-visible paths should use canonical namespace paths only, primarily `/agents`, `/nodes`, and project-bound `/services`
+- workspace lifecycle and topology are managed through `/global/workspaces/control/*.json`
 - memory is accessed through `/global/memory/control/*.json`
+- repository checkout and diff inspection should use `/services/git/control/*.json` when the workspace binds it
+- provider PR synchronization and top-level review publication should use `/services/github_pr/control/*.json` when the workspace binds it
 - terminal execution is performed through `/global/terminal/...`
 - asynchronous waiting should use `/global/events/control/wait.json` and `/global/events/next.json`
 - provider-exposed tools are intentionally narrow, so orchestration should happen through filesystem services rather than ad hoc tool APIs
@@ -85,6 +87,39 @@ The PR review system should be built around a project-scoped controller with thr
 
 This keeps event collection, execution, and approval logic separate enough to debug and evolve.
 
+## Kernel Boundary
+
+Spiderweb should not persist PR-specific fields in its core mission schema.
+
+Instead, the Spiderweb mission record should stay generic and only hold:
+
+- `use_case`
+- normal mission lifecycle state
+- a generic mission `contract` bundle with:
+  - `contract_id`
+  - `context_path`
+  - `state_path`
+  - `artifact_root`
+
+PR Review specifics such as repo identity, PR metadata, review findings, validation output, thread state, and merge recommendation should live in the workspace or service-managed files referenced by that contract.
+
+The use case entrypoint should be a dedicated Venom layered above the generic mission Venom:
+
+- `/services/github_pr/control/ingest_event.json` normalizes a GitHub PR event, emits `/global/events/sources/agent/github_pr.json`, and auto-creates or reuses the matching `pr_review` mission using a stable run id
+- `/services/pr_review/control/intake.json` manually loads one provider PR into a fresh mission, bootstraps the contract files, and can persist an initial provider sync capture
+- `/services/pr_review/control/start.json` creates the mission, derives contract paths, and bootstraps the initial context/state files
+- `/services/pr_review/control/advance.json` is the deterministic runner step: it can resume the mission, wait on `/global/events/...`, drive the next sync/validation pass, and return a `runner.status` / `runner.next_action` pair for Spider Monkey to interpret
+- `/services/pr_review/control/sync.json` updates the PR state file and can orchestrate provider sync, checkout sync, repo status capture, and diff capture through the underlying `github_pr` and `git` Venoms while persisting durable service snapshots under the review `artifact_root`
+- `/services/pr_review/control/run_validation.json` opens a terminal session, runs configured review commands through `/global/terminal`, records per-command service captures, and writes a structured validation artifact with exit-code-backed pass/fail status
+- `/services/pr_review/control/record_validation.json` writes validation output and refreshes the latest validation state
+- `/services/pr_review/control/draft_review.json` hands the mission off to Spider Monkey for one mission-aware drafting step: the agent reads the contract/state/artifacts and is expected to persist the next draft revision through `save_draft.json`
+- `/services/pr_review/control/save_draft.json` writes the agent's evolving findings/recommendation draft to the latest draft files and also snapshots each revision under a draft history directory
+- `/services/pr_review/control/record_review.json` writes findings, recommendation, review-comment drafts, related review artifacts, and can optionally publish the top-level review through `github_pr`
+- `/services/git/*` and `/services/github_pr/*` provide the repo/provider actions that PR Review orchestration should call instead of dropping to raw shell glue
+- `/services/missions/*` remains the generic lifecycle substrate underneath it when that workspace template binds it
+
+These `/services/*` paths are the project-facing bind targets. The canonical local implementation now originates those Venoms under `/nodes/local/venoms/*`, with `/global/*` retained as a compatibility alias. Agents should prefer the bound workspace paths whenever they exist.
+
 ## Project Configuration Model
 
 Each project using this use case should have a PR review configuration record.
@@ -98,18 +133,12 @@ Suggested fields:
   "repositories": [
     {
       "repo_key": "owner/repo",
-      "host": "github",
+      "provider": "github",
       "default_branch": "main",
-      "local_checkout_path": "/workspace/pr-review/repos/owner__repo",
-      "setup": {
-        "install": ["pnpm install --frozen-lockfile"],
-        "baseline_checks": ["pnpm test", "pnpm lint"]
-      },
-      "review": {
-        "commands": ["pnpm test", "pnpm lint"],
-        "auto_fix_allowed": true,
-        "merge_allowed": true
-      }
+      "checkout_path": "/nodes/local/fs/pr-review/repos/owner__repo",
+      "review_policy_paths": ["/nodes/local/fs/policy/pr-review.md"],
+      "default_review_commands": ["pnpm test", "pnpm lint"],
+      "auto_intake": true
     }
   ],
   "approval_policy": {
@@ -122,7 +151,8 @@ Suggested fields:
 
 Notes:
 
-- `local_checkout_path` is a namespace path inside the project rootfs, not a host-internal path.
+- `checkout_path` is the canonical stored field in the current branch. `local_checkout_path` can still be accepted as an alias when onboarding older records.
+- `checkout_path` is a namespace path inside the project rootfs, not a host-internal path.
 - The exact storage location can evolve, but the configuration shape should stay explicit and file-backed.
 
 ## Working Filesystem Layout
@@ -132,7 +162,7 @@ The review worker needs stable project-owned working paths for clones, outputs, 
 Proposed project rootfs layout:
 
 ```text
-/workspace/
+/nodes/local/fs/
   pr-review/
     repos/
       owner__repo/
@@ -150,14 +180,22 @@ Proposed project rootfs layout:
 
 Namespace usage around that workspace:
 
-- `/workspace/...` for project-owned local files
-- `/global/projects/control/*.json` for project lifecycle/status
+- `/nodes/local/fs/...` for project-owned local files
+- `/global/workspaces/control/*.json` for workspace lifecycle/status
 - `/global/memory/control/*.json` for durable compact summaries and search
 - `/global/events/...` for waiting on GitHub or timer events
 - `/global/terminal/...` for shell execution
 - `/nodes/...` only when additional mounted capabilities are needed
 
 The important rule is that all agent-facing paths remain canonical namespace paths. No internal mountpoint paths should leak into prompts, state, or operator messages.
+
+Current control surface in the feature branch:
+
+- `/services/pr_review/control/configure_repo.json`
+- `/services/pr_review/control/get_repo.json`
+- `/services/pr_review/control/list_repos.json`
+
+Those operations own the canonical `repos.json` file under `/nodes/local/fs/pr-review/state/repos.json`.
 
 ## Persistent State Model
 
@@ -223,10 +261,11 @@ The implementation should normalize incoming signals into a small event set:
 Suggested event flow:
 
 1. GitHub adapter receives a webhook, poll result, or CLI query result.
-2. Adapter writes a normalized event into the project event intake path or equivalent task file.
-3. PR Review sub-brain waits using `/global/events/control/wait.json`.
-4. Matching event wakes the task and loads current PR state.
-5. Task decides whether the event is new work, superseded work, or ignorable noise.
+2. Adapter writes the event to `/services/github_pr/control/ingest_event.json`.
+3. `github_pr` normalizes the event, emits it on `/global/events/sources/agent/github_pr.json`, and auto-creates or reuses the matching `pr_review` mission.
+4. PR Review sub-brain waits using `/global/events/control/wait.json`.
+5. Matching event wakes the task and loads current PR state.
+6. Task decides whether the event is new work, superseded work, or ignorable noise.
 
 The design should prefer idempotent handling because GitHub events can repeat or arrive out of order.
 
@@ -265,7 +304,7 @@ Suggested transitions:
 
 For each configured repository:
 
-1. Clone or refresh the default branch into `/workspace/pr-review/repos/...`
+1. Clone or refresh the default branch into `/nodes/local/fs/pr-review/repos/...`
 2. Install required dependencies and tools
 3. Run baseline validation commands
 4. Persist onboarding result and failure details
@@ -425,8 +464,8 @@ Suggested summary fields:
 
 Suggested outputs:
 
-- machine-readable JSON state in `/workspace/pr-review/state/...`
-- human-readable markdown summaries in `/workspace/pr-review/runs/pr-<n>/summary.md`
+- machine-readable JSON state in `/nodes/local/fs/pr-review/state/...`
+- human-readable markdown summaries in `/nodes/local/fs/pr-review/runs/pr-<n>/summary.md`
 - searchable compact summaries in runtime memory
 
 ## Failure Handling
@@ -527,6 +566,27 @@ That yields a usable demonstration:
 4. publish a structured GitHub review
 
 This is enough to prove that Spider can operate as a real PR reviewer before attempting auto-fix and merge automation.
+
+## Current Seeded Eval Coverage
+
+The current branch now includes seeded PR Review regression scenarios in Spiderweb test coverage. These are not the final long-running agent harness, but they provide a first agentic contract layer for the use case:
+
+- manual provider intake bootstrapping through the `pr_review` Venom
+- validation success propagation through terminal-backed review commands
+- validation failure propagation on non-zero command exit codes
+- happy-path review setup with provider sync, checkout sync, repo status capture, diff capture, and dry-run top-level review publication
+- failure-path checkout sync propagation, ensuring the `pr_review` Venom reports a failed status while still persisting the service capture artifact for operator or agent diagnosis
+
+The purpose of these seeded evals is to lock in the mission/service behavior before the fully autonomous Spider Monkey review loop is layered on top.
+
+## Thin Slice Status
+
+The current implementation now reaches the intended `M3` thin-slice boundary:
+
+1. manually load one PR through `/services/pr_review/control/intake.json`
+2. sync provider and checkout state through `/services/pr_review/control/sync.json`
+3. run configured local review commands through `/services/pr_review/control/run_validation.json`
+4. publish a structured top-level GitHub review through `/services/pr_review/control/record_review.json` with `publish_review`
 
 ## Open Questions
 

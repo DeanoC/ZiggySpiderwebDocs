@@ -28,3 +28,18 @@ Related canonical references:
 - Older watch/event names that were previously documented here are intentionally
   not repeated in this overview unless they are present in the canonical
   generated reference.
+
+The node catalog conceptually carries:
+- identity and platform information for a node
+- a set of published venoms or services
+- endpoint and mount projection hints
+- runtime, capability, schema, and permission metadata
+
+That metadata is projected into the Acheron namespace and used by workspace
+mount selection and policy gating.
+
+## Implementation Pointers
+
+- `deps/spider-protocol/src/spiderweb_node/fs_node_service.zig`
+- `deps/spider-protocol/src/spiderweb_node/venom_catalog.zig`
+- `src/server_piai.zig`

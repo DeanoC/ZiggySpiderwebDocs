@@ -10,9 +10,28 @@ Spiderweb exposes a unified project workspace by routing file operations over We
 ### Runtime Flow
 
 1. Node runtime exports one or more roots (exports).
-2. Control plane records mounts and project topology.
+2. Control plane records mounts, binds, project templates, and project topology.
 3. Spiderweb projects mounts into the canonical namespace under `/nodes/*`, `/agents/*`, and `/global/*`.
-4. The mount client (`spiderweb-fs-mount`) connects to the node FS endpoint (`/v2/fs`) and serves a local workspace.
+4. Each project template seeds an initial workspace service surface under `/services/*`, and later mount/bind mutations can extend or change that surface.
+5. The effective workspace service inventory is emitted through project metadata such as `/projects/<project_id>/meta/mounted_services.json`.
+6. The mount client (`spiderweb-fs-mount`) connects to the node FS endpoint (`/v2/fs`) and serves a local workspace.
+
+### Workspace Templates (Current)
+
+- `minimum` seeds only the essential workspace-management bind: `/services/mounts -> /nodes/local/venoms/mounts`
+- `github` seeds repository-review services on top of that minimum set:
+  - `/services/git`
+  - `/services/github_pr`
+  - `/services/missions`
+  - `/services/pr_review`
+  - `/services/terminal`
+  - `/services/events`
+  - `/services/library`
+  - `/services/memory`
+  - `/services/search_code`
+  - `/services/web_search`
+
+The intent is that `/nodes/*` remains the catalog/origin view, while `/services/*` becomes the project-specific use surface for local services.
 
 ### Protocol Notes
 

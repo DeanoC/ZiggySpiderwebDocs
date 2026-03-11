@@ -27,3 +27,25 @@ The current namespace layout is still best understood from the runtime and
 product docs in `SpiderDocs/runtime/` and `SpiderDocs/protocols/`, but message
 names, handshake order, and fixture examples should be read from the canonical
 reference set above.
+
+Common roots include:
+- `/agents`
+- `/nodes`
+- `/global`
+- `/debug` when enabled by policy
+
+Common global surfaces include:
+- chat and job state
+- event wait/next flows
+- memory and built-in venom namespaces
+- workspace and mount control surfaces
+
+Node-exported venoms are projected into `/nodes/<node_id>/venoms/<venom_id>`
+and may also appear through compatibility mount roots derived from the node
+catalog.
+
+## Implementation Pointers
+
+- Namespace session: `src/acheron/session.zig`
+- Policy defaults: `src/workspaces/policy.zig`
+- Control-plane topology: `src/acheron/control_plane.zig`

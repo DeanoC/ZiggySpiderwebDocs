@@ -26,3 +26,17 @@ Related canonical references:
   canonical reference as authoritative.
 - Payload details and fixture examples are maintained under
   `Spiderweb/deps/spider-protocol/sdk/spec/`.
+
+Common control-plane workflows include:
+- agent discovery and selection
+- session attach, resume, restore, and close
+- workspace and project provisioning
+- node and venom catalog management
+- auth and audit surfaces
+
+## Implementation Notes
+
+Primary references:
+- `src/server_piai.zig`
+- `src/agents/agent_registry.zig`
+- `SpiderProtocol/src/unified_types.zig`
