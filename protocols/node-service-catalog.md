@@ -1,171 +1,45 @@
-# Node Venom Catalog Spec
+# Node Service Catalog Overview
 
-The Venom catalog describes node-exported namespace Venoms and their mount metadata. It is the control-plane source used to project `/nodes/<node_id>/venoms/*` and dynamic mount roots in the Acheron namespace.
+This page explains the role of node-exported venoms and namespace drivers at a
+high level. It no longer carries the canonical message list because that drifted
+from the implementation.
 
-## Control Operations
+## What The Catalog Represents
 
-- `control.venom_upsert`
-- `control.venom_get`
-- `control.venom_watch`
-- `control.venom_unwatch`
-- `control.venom_event` (server push)
+- Nodes publish venom metadata into the control plane.
+- Spiderweb projects that metadata into the namespace and into workspace mount
+  selection.
+- Executable namespace venoms can be backed by native process, native in-proc,
+  or WASM runtimes.
 
-## `control.venom_upsert`
+## Canonical References
 
-### Request fields
+Canonical reference:
+- [`unified-v2-control.md`](../../Spiderweb/deps/spider-protocol/docs/protocols/unified-v2-control.md)
 
-- `node_id` (`string`, required)
-- `node_secret` (`string`, required)
-- `platform` (`object`, optional)
-  - `os` (`string`, optional)
-  - `arch` (`string`, optional)
-  - `runtime_kind` (`string`, optional)
-- `labels` (`object<string,string>`, optional)
-- `venoms` (`array`, optional)
+Related canonical references:
+- [`namespace-driver-abi-v1.md`](../../Spiderweb/deps/spider-protocol/docs/protocols/namespace-driver-abi-v1.md)
+- [`spider-venom-wasm-abi-v1.md`](../../Spiderweb/deps/spider-protocol/docs/protocols/spider-venom-wasm-abi-v1.md)
 
-Each Venom entry:
+## Notes
 
-- `venom_id` (`string`, required)
-- `kind` (`string`, required)
-- `version` (`string`, default `"1"`)
-- `state` (`string`, required)
-- `endpoints` (`array<string>`, required, absolute paths)
-- `capabilities` (`object`, optional, default `{}`)
-- `mounts` (`array<object>`, optional, default `[]`)
-  - `mount_id` (`string`, required)
-  - `mount_path` (`string`, required, absolute path)
-  - `state` (`string`, optional; defaults to Venom state)
-- `ops` (`object`, optional, default `{}`)
-  - `invoke` (`string`, optional)
-  - `paths.invoke` (`string`, optional)
-- `runtime` (`object`, optional, default `{}`)
-- `permissions` (`object`, optional, default `{}`)
-- `schema` (`object`, optional, default `{}`)
-- `invoke_template` (`object`, optional)
-- `help_md` (`string`, optional)
+- The canonical control reference is the source of truth for currently supported
+  `control.*` catalog operations.
+- Older watch/event names that were previously documented here are intentionally
+  not repeated in this overview unless they are present in the canonical
+  generated reference.
 
-### Example
+The node catalog conceptually carries:
+- identity and platform information for a node
+- a set of published venoms or services
+- endpoint and mount projection hints
+- runtime, capability, schema, and permission metadata
 
-```json
-{
-  "node_id": "node-2",
-  "node_secret": "secret-...",
-  "platform": { "os": "linux", "arch": "amd64", "runtime_kind": "native" },
-  "labels": { "site": "hq-west", "tier": "edge" },
-  "venoms": [
-    {
-      "venom_id": "camera",
-      "kind": "camera",
-      "version": "1",
-      "state": "online",
-      "endpoints": ["/nodes/node-2/camera"],
-      "capabilities": { "still": true },
-      "mounts": [
-        {
-          "mount_id": "camera",
-          "mount_path": "/nodes/node-2/camera",
-          "state": "online"
-        }
-      ],
-      "ops": { "model": "namespace", "style": "plan9" },
-      "runtime": { "type": "native_proc", "abi": "namespace-driver-v1" },
-      "permissions": { "default": "deny-by-default" },
-      "schema": { "model": "namespace-mount" },
-      "invoke_template": { "op": "capture", "arguments": { "mode": "still" } },
-      "help_md": "Camera namespace driver"
-    }
-  ]
-}
-```
+That metadata is projected into the Acheron namespace and used by workspace
+mount selection and policy gating.
 
-## `control.venom_get`
+## Implementation Pointers
 
-Request fields:
-- `node_id` (`string`, required)
-
-Response fields:
-- `node_id`
-- `node_name`
-- `platform`
-- `labels`
-- `venoms`
-
-## `control.venom_watch`
-
-Subscribes to catalog events. Server responds with `control.venom_event` frames for upserts and changes.
-
-## Validation Notes
-
-- Venom IDs and kinds are identifier-safe strings.
-- Venom IDs must be unique within a single upsert payload.
-- `endpoints` must be absolute-style paths.
-- `capabilities` must be a JSON object.
-- `mounts`, when present, must use absolute `mount_path` values.
-- `ops`, `runtime`, `permissions`, and `schema` must be JSON objects.
-- `invoke_template`, when present, must be a JSON object.
-- `ops.invoke` / `ops.paths.invoke`, when provided, override the default `control/invoke.json` resolve path.
-
-## Mirrored Namespace Contract
-
-Acheron mirrors node catalog entries into `/nodes/<node_id>/venoms/<venom_id>` with these contract files when available:
-
-- `README.md`
-- `SCHEMA.json`
-- `TEMPLATE.json`
-- `CAPS.json`
-- `MOUNTS.json`
-- `OPS.json`
-- `RUNTIME.json`
-- `HOST.json`
-- `PERMISSIONS.json`
-- `STATUS.json`
-
-`HOST.json` is synthesized from `runtime.type` using the shared service runtime host contract, so operator and agent tooling can inspect runtime/supervision capabilities even though the control-plane catalog does not transmit `HOST.json` directly.
-
-## Namespace Permission Projection
-
-`/nodes/<node_id>/venoms/*` visibility for non-admin sessions evaluates Venom `permissions` metadata:
-
-- `allow_roles` (`array<string>`, optional)
-- `default` (`string`, optional)
-- `require_project_token` / `project_token_required` (`bool`, optional)
-
-Admin sessions bypass Venom permission filtering.
-
-## Workspace Mount Gating
-
-`control.workspace_status` applies invoke-policy checks to mount projection for non-admin actors:
-
-- If a mount maps to an invoke-capable Venom, it is omitted unless
-  - project access policy allows `invoke`
-  - Venom `permissions` allow the actor
-
-## `spiderweb-fs-node` Provider Mapping
-
-When `spiderweb-fs-node` runs in control daemon mode (`--control-url`), it auto-upserts Venom metadata:
-
-- FS provider (enabled by default):
-  - `venom_id`: `fs`
-  - `kind`: `fs`
-  - endpoint: `/nodes/<node_id>/fs`
-  - capabilities: `rw`, `export_count`
-  - mounts: `/nodes/<node_id>/fs`
-- Terminal provider (`--terminal-id <id>`):
-  - `venom_id`: `terminal-<id>`
-  - `kind`: `terminal`
-  - endpoint: `/nodes/<node_id>/terminal/<id>`
-  - capabilities: `pty=true`, `terminal_id`, `invoke=true`
-  - ops: `invoke=control/invoke.json` (`paths.exec` alias)
-  - runtime: `native_proc` (`entry=internal-terminal-invoke`)
-  - invoke template: `terminal_exec`
-  - mounts: `/nodes/<node_id>/terminal/<id>`
-- Extra namespace Venoms (from `--venom-manifest` / `--venoms-dir`):
-  - appended after built-in providers
-  - validated for shape and duplicates before publish
-
-Use `--no-fs-venom` to disable FS Venom advertisement and `--label <key=value>` to attach node labels.
-
-Implementation pointers:
 - `deps/spider-protocol/src/spiderweb_node/fs_node_service.zig`
 - `deps/spider-protocol/src/spiderweb_node/venom_catalog.zig`
 - `src/server_piai.zig`

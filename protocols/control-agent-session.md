@@ -1,141 +1,38 @@
-# Unified-v2 Control: Agents & Sessions
+# Control Agent Session Overview
 
-This document describes the control-plane handshake plus the agent discovery and session control operations that Spiderweb implements today.
+This page is an architecture-level summary of the control-plane session flow.
+The exact wire contract now lives in the canonical `spider-protocol` docs so it
+stays aligned with the Zig implementation and generated fixtures.
 
-## Handshake (Required)
+## Current Model
 
-All control operations require an explicit negotiation:
+- Control traffic uses the unified-v2 websocket envelope on the base websocket path.
+- Clients negotiate the control protocol first, then establish a control session.
+- Session, agent, workspace, project, node, and venom operations all sit on that
+  same `control.*` message family.
 
-1. `control.version` with payload `{"protocol":"unified-v2"}`
-2. `control.connect`
+## What To Read For Exact Wire Details
 
-`control.version_ack` returns protocol + Acheron runtime hints:
-- `protocol` (currently `unified-v2`)
-- `acheron_runtime` (currently `acheron-1`)
-- `acheron_node` (currently `unified-v2-fs`)
-- `acheron_node_proto` (currently `2`)
+Canonical reference:
+- [`unified-v2-control.md`](../../Spiderweb/deps/spider-protocol/docs/protocols/unified-v2-control.md)
 
-`control.connect_ack` returns session binding and gating information:
-- `agent_id`
-- `project_id` (nullable)
-- `session` (current session key)
-- `protocol`
-- `role` (`admin` | `user`)
-- `bootstrap_only` (bool)
-- `bootstrap_message` (nullable)
-- `requires_session_attach` (bool)
-- `connect_gate` (nullable `{code,message}`)
+Related canonical references:
+- [`acheron-runtime-v1.md`](../../Spiderweb/deps/spider-protocol/docs/protocols/acheron-runtime-v1.md)
+- [`node-fs-unified-v2.md`](../../Spiderweb/deps/spider-protocol/docs/protocols/node-fs-unified-v2.md)
 
-## Agent Discovery
+## Notes
 
-### `control.agent_list`
-Returns all agent registry entries.
+- If this overview and the generated canonical reference disagree, treat the
+  canonical reference as authoritative.
+- Payload details and fixture examples are maintained under
+  `Spiderweb/deps/spider-protocol/sdk/spec/`.
 
-### `control.agent_get`
-Requires payload `{"agent_id":"<id>"}`.
-
-Agent fields:
-- `id`
-- `name`
-- `description`
-- `is_default`
-- `identity_loaded`
-- `persona_pack` (nullable)
-- `capabilities` (array of `chat`, `code`, `plan`, `research`)
-
-Errors:
-- `agent_not_found`
-- `missing_field`
-- `invalid_payload`
-
-## Session Control
-
-Supported operations:
-- `control.session_attach`
-- `control.session_status`
-- `control.session_resume`
-- `control.session_list`
-- `control.session_close`
-- `control.session_restore`
-- `control.session_history`
-
-### `control.session_attach`
-Payload:
-- `session_key` (required)
-- `agent_id` (required)
-- `project_id` (optional)
-- `project_token` (optional)
-
-Notes:
-- User role cannot attach to the system agent/project.
-- When no non-system project exists, users will be gated until an admin provisions one.
-- If a project requires a token, `project_token` is required for token-scoped actions.
-
-Response payload:
-- `session_key`
-- `agent_id`
-- `project_id` (nullable)
-- `workspace` (workspace status snapshot)
-- `attach` (runtime attach state snapshot)
-
-### `control.session_status`
-Payload:
-- `session_key` (optional; defaults to active session)
-
-Response payload:
-- `session_key`
-- `agent_id`
-- `project_id` (nullable)
-- `attach` (runtime attach state snapshot)
-- `session_last_activity_ms`
-- `session_stale`
-- `agent_last_heartbeat_ms`
-- `agent_stale`
-- `recoverable`
-
-### `control.session_resume`
-Payload:
-- `session_key` (required)
-
-### `control.session_list`
-Response payload:
-- `active_session`
-- `sessions[]` entries with `session_key`, `agent_id`, `project_id`
-
-### `control.session_close`
-Payload:
-- `session_key` (required)
-
-### `control.session_restore`
-Payload:
-- `agent_id` (optional)
-
-Response payload:
-- `{"found":false}` when no persisted session exists
-- `{"found":true,"session":{...}}` when a session is available
-
-Returned `session` fields:
-- `session_key`
-- `agent_id`
-- `project_id`
-- `last_active_ms`
-- `message_count`
-- `summary` (nullable)
-
-### `control.session_history`
-Payload:
-- `agent_id` (optional)
-- `limit` (optional, default 10, max 100)
-
-Response payload:
-- `sessions` list (newest-first)
-
-## Related Control Operations
-
-- `control.project_*`, `control.workspace_status` for project provisioning
-- `control.node_*` and `control.venom_*` for node lifecycle and Venom catalog
-- `control.auth_status`, `control.auth_rotate` for control-plane tokens
-- `control.audit_tail` for audit trail
+Common control-plane workflows include:
+- agent discovery and selection
+- session attach, resume, restore, and close
+- workspace and project provisioning
+- node and venom catalog management
+- auth and audit surfaces
 
 ## Implementation Notes
 
