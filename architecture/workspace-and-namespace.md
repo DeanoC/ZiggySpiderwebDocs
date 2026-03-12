@@ -6,7 +6,7 @@ The workspace namespace is the main contract that Spiderweb exposes to workers.
 
 ### `/services`
 
-Project-bound service aliases. Workers should prefer these paths first because they represent the services mounted into the current workspace.
+Workspace-bound service aliases. Workers should prefer these paths first because they represent the services mounted into the current workspace.
 
 Common built-in bindings include:
 
@@ -36,11 +36,11 @@ Attached agent identities and related state. Namespace attaches can automaticall
 
 ### `/global`
 
-Global discovery aliases and catalog surfaces that are not tied to one project bind path.
+Global discovery aliases and catalog surfaces that are not tied to one workspace bind path.
 
-### `/projects/<id>/meta`
+### `/projects/<workspace_id>/meta`
 
-Project-scoped metadata published as files.
+Workspace-scoped metadata published as files under the current namespace path.
 
 Current metadata includes:
 
@@ -90,13 +90,13 @@ Spiderweb then binds selected ones into `/services/<name>` for the current works
 
 - `/nodes/local/venoms/*` tells you where a service originates
 - `/services/*` tells you what the current workspace exposes
-- `/projects/<id>/meta/binds.json` tells you how those two views are connected
+- `/projects/<workspace_id>/meta/binds.json` tells you how those two views are connected
 
 ## Routed Workspace Mode Versus Full Namespace Mode
 
 `spiderweb-fs-mount` supports two attachment styles:
 
 - `--workspace-url`: routed `/v2/fs` workspace mount focused on filesystem access
-- `--namespace-url`: full Spiderweb attach that exposes `/services`, `/nodes`, `/agents`, `/global`, and project metadata directly
+- `--namespace-url`: full Spiderweb attach that exposes `/services`, `/nodes`, `/agents`, `/global`, and workspace metadata directly
 
 Use full namespace mode when the worker needs the complete discovery surface, not just the routed workspace export.

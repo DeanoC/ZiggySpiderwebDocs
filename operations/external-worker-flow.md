@@ -20,14 +20,14 @@ Example:
 
 ### Full Namespace Mode
 
-Use `--namespace-url` when the worker needs the full Spiderweb namespace, including `/services`, `/nodes`, `/agents`, `/global`, and project metadata.
+Use `--namespace-url` when the worker needs the full Spiderweb namespace, including `/services`, `/nodes`, `/agents`, `/global`, and workspace metadata.
 
 Example:
 
 ```bash
 ./zig-out/bin/spiderweb-fs-mount \
   --namespace-url ws://127.0.0.1:18790/ \
-  --project-id <workspace-id> \
+  --workspace-id <workspace-id> \
   --auth-token <token> \
   --agent-id codex \
   --session-key main \
@@ -41,8 +41,8 @@ Namespace attach can automatically ensure the agent identity and seed `/agents/<
 The worker should discover the live environment in this order:
 
 1. `/meta/protocol.json`
-2. `/projects/<project_id>/meta/mounted_services.json`
-3. `/projects/<project_id>/meta/workspace_status.json`
+2. `/projects/<workspace_id>/meta/mounted_services.json`
+3. `/projects/<workspace_id>/meta/workspace_status.json`
 4. `/services/<service>/README.md`
 5. `/services/<service>/OPS.json`
 6. `/services/<service>/SCHEMA.json`
@@ -57,7 +57,7 @@ Any external worker should assume:
 
 - the namespace is the source of truth
 - `/services/*` is the preferred shared capability surface
-- `/projects/<id>/meta/*` describes the live topology and health
+- `/projects/<workspace_id>/meta/*` describes the live topology and health
 - worker-private surfaces may appear under `/nodes/<worker_id>/venoms/*`
 - service contracts are defined by files, not out-of-band SDK assumptions
 
